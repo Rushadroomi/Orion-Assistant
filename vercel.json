@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "proxy-server/api/chat.js", "use": "@vercel/node" },
+    { "src": "orion.js", "use": "@vercel/static" },
+    { "src": "demo/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/chat", "dest": "proxy-server/api/chat.js" },
+    { "src": "/orion.js", "dest": "/orion.js" },
+    { "src": "/demo/(.*)", "dest": "/demo/$1" },
+    { "src": "/", "dest": "/demo/index.html" }
+  ]
+}
