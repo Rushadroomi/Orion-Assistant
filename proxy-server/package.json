@@ -1,0 +1,14 @@
+{
+  "name": "orion-proxy",
+  "version": "1.0.0",
+  "description": "Lightweight proxy server for Orion Assistant — keeps API key server-side",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "license": "MIT"
+}
