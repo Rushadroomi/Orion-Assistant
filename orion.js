@@ -1,27 +1,25 @@
 /**
  * Orion Assistant — Embeddable AI Chat Widget
- * Version: 1.1.0 — Smart Page Routing
+ * Version: 1.2.0 — OpenRouter Support
  *
  * Usage:
  *   <script>
  *     window.OrionConfig = {
- *       apiKey: "sk-ant-...",          // required
- *       botName: "Orion",             // optional
- *       subtitle: "AI Assistant",     // optional
- *       primaryColor: "#534AB7",      // optional
- *       position: "right",            // optional: "right" | "left"
- *       systemPrompt: "You are...",   // optional
- *       knowledgeBase: [              // optional
+ *       apiKey:      "sk-or-YOUR-OPENROUTER-KEY",  // required
+ *       model:       "openrouter/free", // optional, this is default
+ *       botName:     "Orion",
+ *       subtitle:    "AI Assistant",
+ *       primaryColor:"#534AB7",
+ *       position:    "right",
+ *       systemPrompt:"You are...",
+ *       pages: [
+ *         { title: "Enroll Now", url: "/enroll", keywords: ["enroll","register"] }
+ *       ],
+ *       knowledgeBase: [
  *         { q: "What are hours?", a: "9am-6pm Mon-Sat" }
  *       ],
- *       pages: [                      // optional — smart page routing
- *         { title: "Enroll Now",  url: "/enroll",  keywords: ["enroll", "register", "sign up"] },
- *         { title: "Courses",     url: "/courses", keywords: ["courses", "bootcamp", "programs"] },
- *         { title: "Pricing",     url: "/pricing", keywords: ["price", "cost", "fee"] },
- *         { title: "Contact Us",  url: "/contact", keywords: ["contact", "support", "help"] }
- *       ],
  *       welcomeMessage: "Hi! How can I help?",
- *       placeholder: "Type a message...",
+ *       placeholder:    "Type a message...",
  *     }
  *   </script>
  *   <script src="orion.js"></script>
@@ -34,6 +32,7 @@
 
   // ── Config defaults ───────────────────────────────────────────────
   const API_KEY        = cfg.apiKey || "";
+  const MODEL          = cfg.model || "openrouter/free";
   const BOT_NAME       = cfg.botName || "Orion";
   const SUBTITLE       = cfg.subtitle || "Orion Assistant";
   const PRIMARY        = cfg.primaryColor || "#534AB7";
@@ -44,6 +43,9 @@
   const PAGES          = cfg.pages || [];
   const SYSTEM_PROMPT  = cfg.systemPrompt ||
     `You are ${BOT_NAME}, a helpful and friendly AI assistant embedded on a website. Answer questions clearly and concisely. If you don't know something, say so honestly.`;
+
+  // ── OpenRouter API config ─────────────────────────────────────────
+  const API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
   // ── Derived ───────────────────────────────────────────────────────
   const LETTER        = BOT_NAME.charAt(0).toUpperCase();
@@ -79,7 +81,7 @@
         prompt += `- "${p.title}" → ${p.url}  (keywords: ${p.keywords.join(", ")})\n`;
       });
       prompt += `
-At the END of your reply, if the user's question is clearly answered by one of the pages above, append EXACTLY this on a new line (nothing else after it):
+At the END of your reply, if the user's question is clearly answered by visiting one of the pages above, append EXACTLY this on a new line:
 ROUTE:{"title":"Page Title","url":"/page-url"}
 
 Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per reply. Do not mention the ROUTE tag in your text — it will be converted to a button automatically.`;
@@ -88,12 +90,12 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
     return prompt;
   }
 
-  // ── Smart page routing: parse ROUTE tag from reply ────────────────
+  // ── Parse ROUTE tag from reply ────────────────────────────────────
   function parseRoute(text) {
     const match = text.match(/ROUTE:(\{[^}]+\})/);
     if (!match) return { text, route: null };
     try {
-      const route = JSON.parse(match[1]);
+      const route    = JSON.parse(match[1]);
       const cleanText = text.replace(/\n?ROUTE:\{[^}]+\}/, "").trimEnd();
       return { text: cleanText, route };
     } catch {
@@ -101,12 +103,11 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
     }
   }
 
-  // ── Keyword fallback routing (client-side, no API needed) ─────────
+  // ── Keyword fallback routing ──────────────────────────────────────
   function detectRouteFromKeywords(userText) {
     if (!PAGES.length) return null;
     const lower = userText.toLowerCase();
-    let best = null;
-    let bestScore = 0;
+    let best = null, bestScore = 0;
     PAGES.forEach(page => {
       const score = page.keywords.filter(k => lower.includes(k.toLowerCase())).length;
       if (score > bestScore) { bestScore = score; best = page; }
@@ -117,9 +118,10 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
   // ── Inject CSS ────────────────────────────────────────────────────
   function injectStyles() {
     const side = POSITION === "left" ? "left: 24px; right: auto;" : "right: 24px; left: auto;";
-    const msgRadius = POSITION === "left"
-      ? { bot: "4px 14px 14px 14px", user: "14px 14px 4px 14px" }
-      : { bot: "4px 14px 14px 14px", user: "14px 4px 14px 14px" };
+    const msgRadius = {
+      bot:  "4px 14px 14px 14px",
+      user: POSITION === "left" ? "14px 14px 4px 14px" : "14px 4px 14px 14px"
+    };
 
     const css = `
       #orion-launcher {
@@ -148,20 +150,10 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
         pointer-events: none;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       }
-      #orion-window.open {
-        opacity: 1; transform: translateY(0) scale(1); pointer-events: all;
-      }
+      #orion-window.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
 
-      .or-header {
-        background: ${PRIMARY}; padding: 16px 18px;
-        display: flex; align-items: center; gap: 12px; flex-shrink: 0;
-      }
-      .or-avatar {
-        width: 36px; height: 36px; border-radius: 50%;
-        background: rgba(255,255,255,0.2);
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0;
-      }
+      .or-header { background: ${PRIMARY}; padding: 16px 18px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+      .or-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0; }
       .or-header-text { flex: 1; }
       .or-header-name { font-size: 15px; font-weight: 600; color: #fff; line-height: 1.2; }
       .or-header-sub { font-size: 12px; color: rgba(255,255,255,0.75); }
@@ -171,42 +163,22 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
       .or-close-btn { background: transparent; border: none; cursor: pointer; color: rgba(255,255,255,0.8); padding: 4px; line-height: 0; border-radius: 6px; }
       .or-close-btn:hover { color: #fff; background: rgba(255,255,255,0.15); }
 
-      .or-messages {
-        flex: 1; overflow-y: auto; padding: 16px 14px;
-        display: flex; flex-direction: column; gap: 12px;
-        background: #f8f8fb; scroll-behavior: smooth;
-      }
+      .or-messages { flex: 1; overflow-y: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; background: #f8f8fb; scroll-behavior: smooth; }
       .or-messages::-webkit-scrollbar { width: 4px; }
       .or-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
       .or-msg-row { display: flex; align-items: flex-end; gap: 8px; }
       .or-msg-row.user { flex-direction: row-reverse; }
-      .or-msg-avatar {
-        width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 11px; font-weight: 600;
-      }
+      .or-msg-avatar { width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
       .or-msg-avatar.bot { background: ${PRIMARY_LIGHT}; color: ${PRIMARY_DARK}; }
       .or-msg-avatar.user { background: #e2e2e8; color: #555; }
 
-      .or-bubble {
-        max-width: 82%; padding: 9px 13px; font-size: 14px; line-height: 1.55;
-        word-break: break-word;
-      }
-      .or-bubble.bot {
-        background: #ffffff; color: #1a1a1a;
-        border-radius: ${msgRadius.bot};
-        border: 1px solid #ebebeb;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      }
-      .or-bubble.user {
-        background: ${PRIMARY}; color: #ffffff;
-        border-radius: ${msgRadius.user};
-      }
+      .or-bubble { max-width: 82%; padding: 9px 13px; font-size: 14px; line-height: 1.55; word-break: break-word; }
+      .or-bubble.bot { background: #ffffff; color: #1a1a1a; border-radius: ${msgRadius.bot}; border: 1px solid #ebebeb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+      .or-bubble.user { background: ${PRIMARY}; color: #ffffff; border-radius: ${msgRadius.user}; }
       .or-time { font-size: 10px; color: #aaa; margin-top: 3px; text-align: right; }
       .or-msg-row.bot .or-time { text-align: left; }
 
-      /* ── Page route button ── */
       .or-route-btn {
         display: inline-flex; align-items: center; gap: 7px;
         margin-top: 8px; padding: 8px 14px;
@@ -216,7 +188,7 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
         text-decoration: none; transition: background 0.15s, transform 0.1s;
         box-shadow: 0 2px 8px rgba(83,74,183,0.25);
       }
-      .or-route-btn:hover { background: ${PRIMARY_DARK}; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(83,74,183,0.3); }
+      .or-route-btn:hover { background: ${PRIMARY_DARK}; transform: translateY(-1px); }
       .or-route-btn:active { transform: translateY(0); }
       .or-route-btn svg { flex-shrink: 0; }
 
@@ -226,34 +198,18 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
       .or-typing-dot:nth-child(3){animation-delay:.36s}
       @keyframes or-typing { 0%,100%{transform:translateY(0);opacity:.4} 50%{transform:translateY(-4px);opacity:1} }
 
-      .or-input-area {
-        padding: 12px 14px; background: #fff;
-        border-top: 1px solid #efefef; flex-shrink: 0;
-      }
+      .or-input-area { padding: 12px 14px; background: #fff; border-top: 1px solid #efefef; flex-shrink: 0; }
       .or-input-row { display: flex; gap: 8px; align-items: flex-end; }
-      .or-input {
-        flex: 1; padding: 9px 12px; border-radius: 10px;
-        border: 1.5px solid #e0e0e8; background: #f8f8fb;
-        font-size: 14px; font-family: inherit; color: #1a1a1a;
-        resize: none; min-height: 38px; max-height: 110px;
-        line-height: 1.45; outline: none; transition: border-color 0.15s;
-      }
+      .or-input { flex: 1; padding: 9px 12px; border-radius: 10px; border: 1.5px solid #e0e0e8; background: #f8f8fb; font-size: 14px; font-family: inherit; color: #1a1a1a; resize: none; min-height: 38px; max-height: 110px; line-height: 1.45; outline: none; transition: border-color 0.15s; }
       .or-input:focus { border-color: ${PRIMARY}; background: #fff; }
       .or-input::placeholder { color: #bbb; }
-      .or-send {
-        width: 38px; height: 38px; border-radius: 10px; border: none;
-        background: ${PRIMARY}; color: #fff; cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        transition: background 0.15s, transform 0.1s; flex-shrink: 0;
-      }
+      .or-send { width: 38px; height: 38px; border-radius: 10px; border: none; background: ${PRIMARY}; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s, transform 0.1s; flex-shrink: 0; }
       .or-send:hover { background: ${PRIMARY_DARK}; }
       .or-send:active { transform: scale(0.95); }
       .or-send:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
-      .or-branding {
-        text-align: center; padding: 6px; font-size: 10px; color: #ccc;
-        background: #fff; border-top: 1px solid #f2f2f2;
-      }
+      .or-model-tag { font-size: 10px; color: #ccc; text-align: center; padding: 4px; background: #fff; }
+      .or-branding { text-align: center; padding: 4px 0 6px; font-size: 10px; color: #ccc; background: #fff; border-top: 1px solid #f2f2f2; }
       .or-branding a { color: #bbb; text-decoration: none; }
       .or-branding a:hover { color: #888; }
 
@@ -312,7 +268,8 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
           </button>
         </div>
       </div>
-      <div class="or-branding">Powered by <a href="https://anthropic.com" target="_blank" rel="noopener">Claude AI</a></div>`;
+      <div class="or-model-tag">${MODEL}</div>
+      <div class="or-branding">Powered by <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a></div>`;
 
     document.body.appendChild(launcher);
     document.body.appendChild(win);
@@ -338,13 +295,12 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
     if (!isOpen) setTimeout(() => document.getElementById("or-input").focus(), 220);
   }
 
-  // ── Append message (with optional route button) ───────────────────
+  // ── Append message ────────────────────────────────────────────────
   function appendMessage(role, text, route) {
     const msgs  = document.getElementById("or-messages");
     const isBot = role === "bot";
     const time  = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-    // Build route button HTML if route provided
     let routeHtml = "";
     if (route && route.url && route.title) {
       routeHtml = `
@@ -405,7 +361,7 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
     el.style.height = Math.min(el.scrollHeight, 110) + "px";
   }
 
-  // ── Send message ──────────────────────────────────────────────────
+  // ── Send message via OpenRouter ───────────────────────────────────
   async function sendMessage() {
     if (isLoading) return;
     const input   = document.getElementById("or-input");
@@ -414,7 +370,7 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
     if (!text) return;
 
     if (!API_KEY) {
-      appendMessage("bot", "⚠️ No API key configured. Please set apiKey in window.OrionConfig.", null);
+      appendMessage("bot", "⚠️ No API key set. Add your OpenRouter key to window.OrionConfig.apiKey", null);
       return;
     }
 
@@ -428,19 +384,21 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
     showTyping();
 
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": API_KEY,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true"
+          "Authorization": `Bearer ${API_KEY}`,
+          "HTTP-Referer": window.location.href,
+          "X-Title": BOT_NAME
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: MODEL,
           max_tokens: 1000,
-          system: buildSystemPrompt(),
-          messages: history
+          messages: [
+            { role: "system", content: buildSystemPrompt() },
+            ...history
+          ]
         })
       });
 
@@ -448,14 +406,11 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
       removeTyping();
 
       if (data.error) {
-        showError(data.error.message || "API error. Check your API key.");
+        showError(data.error.message || "API error. Check your OpenRouter key.");
       } else {
-        const raw            = data.content[0].text;
+        const raw   = data.choices[0].message.content;
         const { text: reply, route } = parseRoute(raw);
-
-        // Fallback: if Claude didn't route but keywords match, route anyway
         const finalRoute = route || (PAGES.length ? detectRouteFromKeywords(text) : null);
-
         history.push({ role: "assistant", content: raw });
         appendMessage("bot", reply, finalRoute);
       }
