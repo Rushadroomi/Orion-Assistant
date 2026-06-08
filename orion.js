@@ -369,8 +369,8 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
     const text    = input.value.trim();
     if (!text) return;
 
-    if (!API_KEY) {
-      appendMessage("bot", "⚠️ No API key set. Add your OpenRouter key to window.OrionConfig.apiKey", null);
+    if (!API_KEY && !cfg.apiEndpoint) {
+      appendMessage("bot", "⚠️ No API key or proxy endpoint set. Add apiKey or apiEndpoint to window.OrionConfig", null);
       return;
     }
 
@@ -384,14 +384,17 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
     showTyping();
 
     try {
+      const usingProxy = !!cfg.apiEndpoint;
+      const headers = { "Content-Type": "application/json" };
+      if (!usingProxy && API_KEY) {
+        headers["Authorization"] = `Bearer ${API_KEY}`;
+        headers["HTTP-Referer"] = window.location.href;
+        headers["X-Title"] = BOT_NAME;
+      }
+
       const res = await fetch(API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${API_KEY}`,
-          "HTTP-Referer": window.location.href,
-          "X-Title": BOT_NAME
-        },
+        headers,
         body: JSON.stringify({
           model: MODEL,
           max_tokens: 1000,

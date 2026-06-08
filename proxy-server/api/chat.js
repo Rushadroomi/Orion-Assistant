@@ -1,31 +1,38 @@
 /**
- * Vercel Serverless Function — Orion Assistant API Proxy
- * ─────────────────────────────────────────────
- * Deploy to Vercel for free. Set ANTHROPIC_API_KEY in Vercel env vars.
+ * Orion Assistant — Vercel Proxy (OpenRouter)
+ * Keeps your OpenRouter API key server-side.
+ * Set ANTHROPIC_API_KEY = your OpenRouter key in Vercel env vars.
  *
- * File location: /api/chat.js
- * Endpoint URL:  https://your-project.vercel.app/api/chat
+ * Endpoint: POST /api/chat
+ * Body: { model, messages, max_tokens }
  */
 
 const https = require("https");
 
-function anthropicRequest(body) {
+function openRouterRequest(body) {
   return new Promise((resolve, reject) => {
-    const postData = JSON.stringify(body);
+    const postData = JSON.stringify({
+      model:      body.model || "openrouter/free",
+      max_tokens: body.max_tokens || 1000,
+      messages:   body.messages
+    });
+
     const options = {
-      hostname: "api.anthropic.com",
-      path: "/v1/messages",
-      method: "POST",
+      hostname: "openrouter.ai",
+      path:     "/api/v1/chat/completions",
+      method:   "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type":   "application/json",
         "Content-Length": Buffer.byteLength(postData),
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
+        "Authorization":  `Bearer ${process.env.ANTHROPIC_API_KEY}`,
+        "HTTP-Referer":   "https://orion-proxy-server.vercel.app",
+        "X-Title":        "Orion Assistant"
+      }
     };
+
     const req = https.request(options, (res) => {
       let data = "";
-      res.on("data", (c) => (data += c));
+      res.on("data", c => (data += c));
       res.on("end", () => resolve({ status: res.statusCode, body: data }));
     });
     req.on("error", reject);
@@ -35,20 +42,20 @@ function anthropicRequest(body) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", process.env.ALLOWED_ORIGIN || "*");
+  res.setHeader("Access-Control-Allow-Origin",  "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") { res.status(204).end(); return; }
-  if (req.method !== "POST") { res.status(405).json({ error: "Method not allowed" }); return; }
+  if (req.method !== "POST")    { res.status(405).json({ error: "Method not allowed" }); return; }
 
   if (!process.env.ANTHROPIC_API_KEY) {
-    res.status(500).json({ error: { message: "ANTHROPIC_API_KEY not configured." } });
+    res.status(500).json({ error: { message: "API key not configured on server." } });
     return;
   }
 
   try {
-    const result = await anthropicRequest(req.body);
+    const result = await openRouterRequest(req.body);
     res.status(result.status).json(JSON.parse(result.body));
   } catch (err) {
     res.status(502).json({ error: { message: err.message } });

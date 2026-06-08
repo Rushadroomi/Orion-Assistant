@@ -235,16 +235,16 @@
 <!-- Live demo widget -->
 <script>
   window.OrionConfig = {
-    apiKey: "",
-    botName: "Orion",
-    subtitle: "Live demo",
-    primaryColor: "#534AB7",
-    systemPrompt: "You are Orion, a demo assistant. Since no API key is set, tell the user to add their Anthropic API key to window.OrionConfig.apiKey to activate the bot.",
-    welcomeMessage: "Hi! I'm Orion 👋 Add your Anthropic API key to activate me. Check the docs above!",
-    pages: [
-      { title: "Get API Key", url: "https://console.anthropic.com", keywords: ["api key", "key", "activate", "how"] }
-    ]
-  }
+  apiEndpoint: "https://orion-proxy-server.vercel.app/api/chat",  // proxy — key is safe
+  botName: "Orion",
+  primaryColor: "#534AB7",
+  systemPrompt: "You are Orion, a helpful assistant.",
+  pages: [
+    { title: "Enroll Now",  url: "/enroll",  keywords: ["enroll", "register", "sign up"] },
+    { title: "Pricing",     url: "/pricing", keywords: ["price", "cost", "fee"] },
+    { title: "Contact Us",  url: "/contact", keywords: ["contact", "support"] }
+  ]
+}
 </script>
 <script src="../orion.js"></script>
 
