@@ -3,72 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Orion Assistant Demo — AI Chat Widget</title>
+  <title>Orion Assistant — Embeddable AI Chat Widget</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f5f5f8; color: #1a1a1a; min-height: 100vh;
-    }
-    header {
-      background: #1a1a2e; padding: 20px 40px;
-      display: flex; align-items: center; gap: 14px;
-    }
-    .logo { width: 36px; height: 36px; background: #534AB7; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 16px; color: #fff; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f8; color: #1a1a1a; min-height: 100vh; }
+
+    header { background: #1a1a2e; padding: 20px 40px; display: flex; align-items: center; gap: 14px; }
+    .logo { width: 36px; height: 36px; background: #534AB7; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: #fff; }
     header h1 { color: #fff; font-size: 20px; font-weight: 600; }
-    header span { color: #a9a0f0; font-size: 14px; margin-left: 8px; }
+    header span { color: #a9a0f0; font-size: 13px; margin-left: 8px; }
 
     main { max-width: 900px; margin: 48px auto; padding: 0 24px; }
+
     .hero { text-align: center; margin-bottom: 56px; }
     .hero h2 { font-size: 36px; font-weight: 700; line-height: 1.2; margin-bottom: 14px; }
     .hero h2 em { color: #534AB7; font-style: normal; }
     .hero p { font-size: 16px; color: #666; max-width: 520px; margin: 0 auto 28px; line-height: 1.6; }
     .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn { padding: 11px 24px; border-radius: 10px; font-size: 14px; font-weight: 500;
-      cursor: pointer; border: none; text-decoration: none; display: inline-block; }
+    .btn { padding: 11px 24px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; display: inline-block; }
     .btn-primary { background: #534AB7; color: #fff; }
     .btn-primary:hover { background: #3C3489; }
     .btn-outline { background: transparent; color: #534AB7; border: 1.5px solid #534AB7; }
     .btn-outline:hover { background: #EEEDFE; }
 
-    .section-label { font-size: 12px; font-weight: 600; color: #534AB7; text-transform: uppercase;
-      letter-spacing: 0.08em; margin-bottom: 10px; }
-    .card { background: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px;
-      border: 1px solid #e8e8ef; }
+    .section-label { font-size: 12px; font-weight: 600; color: #534AB7; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+    .card { background: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; border: 1px solid #e8e8ef; }
     .card h3 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
     .card p { font-size: 14px; color: #666; margin-bottom: 18px; line-height: 1.6; }
 
-    pre {
-      background: #13131f; color: #e0deff; border-radius: 10px; padding: 20px 22px;
-      font-size: 13px; line-height: 1.7; overflow-x: auto;
-      font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
-    }
-    .token-comment { color: #6b7db3; }
-    .token-key { color: #a9a0f0; }
-    .token-string { color: #7ec9a0; }
-    .token-tag { color: #f0a070; }
-    .token-attr { color: #a9a0f0; }
+    pre { background: #13131f; color: #e0deff; border-radius: 10px; padding: 20px 22px; font-size: 13px; line-height: 1.7; overflow-x: auto; font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; }
+    .c  { color: #6b7db3; }
+    .k  { color: #a9a0f0; }
+    .s  { color: #7ec9a0; }
+    .t  { color: #f0a070; }
+    .n  { color: #f9c74f; }
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
-    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } main { padding: 0 14px; } }
 
     .option-card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #e8e8ef; }
     .option-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
     .option-card p { font-size: 13px; color: #888; line-height: 1.5; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600;
-      margin-bottom: 8px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-bottom: 8px; }
     .badge-purple { background: #EEEDFE; color: #3C3489; }
     .badge-green  { background: #E1F5EE; color: #0F6E56; }
+    .badge-blue   { background: #E8F0FE; color: #1a56cc; }
     .badge-gray   { background: #F1EFE8; color: #5F5E5A; }
 
+    .new-badge { background: #534AB7; color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 10px; vertical-align: middle; margin-left: 6px; }
+
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; padding: 10px 12px; background: #f5f5f8;
-      font-size: 11px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.06em; }
+    th { text-align: left; padding: 10px 12px; background: #f5f5f8; font-size: 11px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.06em; }
     td { padding: 10px 12px; border-top: 1px solid #f0f0f4; color: #444; vertical-align: top; }
     td code { background: #f0f0f8; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #534AB7; }
     td:last-child { color: #888; }
+
+    .preview-box { background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 16px; display: flex; align-items: flex-start; gap: 10px; }
+    .preview-avatar { width: 28px; height: 28px; background: #534AB7; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; flex-shrink: 0; }
+    .preview-bubble { background: #fff; border-radius: 4px 12px 12px 12px; padding: 10px 13px; font-size: 13px; line-height: 1.55; color: #1a1a1a; max-width: 280px; }
+    .preview-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 7px 13px; background: #534AB7; color: #fff; border-radius: 8px; font-size: 12px; font-weight: 500; text-decoration: none; }
 
     .footer { text-align: center; padding: 40px 20px; color: #aaa; font-size: 13px; }
   </style>
@@ -76,17 +69,18 @@
 <body>
 
 <header>
-  <div class="logo">A</div>
-  <h1>Orion Assistant Widget</h1>
-  <span>Embeddable AI Chat — Developer Docs</span>
+  <div class="logo">O</div>
+  <h1>Orion Assistant</h1>
+  <span>v1.1 — Embeddable AI Chat Widget · Developer Docs</span>
 </header>
 
 <main>
   <div class="hero">
     <h2>Add an <em>AI assistant</em><br/>to any website in 2 minutes</h2>
-    <p>One config block + one script tag. Your API key, your bot, your brand.</p>
+    <p>One config block + one script tag. Your API key, your bot, your brand. Now with smart page routing.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#quickstart">Quickstart →</a>
+      <a class="btn btn-outline" href="#page-routing">Page Routing ✦</a>
       <a class="btn btn-outline" href="#config-ref">Config reference</a>
     </div>
   </div>
@@ -96,55 +90,107 @@
     <div class="section-label">Quickstart</div>
     <div class="card">
       <h3>Step 1 — Get your Anthropic API key</h3>
-      <p>Create a free account at <strong>console.anthropic.com</strong> and grab your API key. You pay only for what your bot uses. New accounts get free credits.</p>
+      <p>Create a free account at <strong>console.anthropic.com</strong> and grab your API key. New accounts receive free credits.</p>
 
-      <h3 style="margin-top:20px">Step 2 — Add this to your website</h3>
-      <p>Paste this snippet before the closing <code style="background:#f0f0f8;padding:2px 6px;border-radius:4px;font-size:12px">&lt;/body&gt;</code> tag:</p>
-
-      <pre><span class="token-comment">&lt;!-- Orion Assistant: your API key lives here, never shared --&gt;</span>
-<span class="token-tag">&lt;script&gt;</span>
+      <h3 style="margin-top:20px">Step 2 — Paste this before &lt;/body&gt;</h3>
+      <pre><span class="c">&lt;!-- Orion Assistant — add before &lt;/body&gt; --&gt;</span>
+<span class="t">&lt;script&gt;</span>
   window.OrionConfig = {
-    <span class="token-key">apiKey</span>:        <span class="token-string">"sk-ant-api03-YOUR-KEY-HERE"</span>,  <span class="token-comment">// required</span>
-    <span class="token-key">botName</span>:       <span class="token-string">"MyBot"</span>,
-    <span class="token-key">subtitle</span>:      <span class="token-string">"Ask me anything"</span>,
-    <span class="token-key">primaryColor</span>:  <span class="token-string">"#534AB7"</span>,
-    <span class="token-key">systemPrompt</span>:  <span class="token-string">"You are a helpful assistant for MyWebsite. Answer questions about our products clearly and concisely."</span>,
-    <span class="token-key">welcomeMessage</span>: <span class="token-string">"Hi! I'm MyBot 👋 How can I help?"</span>,
-    <span class="token-key">knowledgeBase</span>: [
-      { <span class="token-key">q</span>: <span class="token-string">"What are your opening hours?"</span>, <span class="token-key">a</span>: <span class="token-string">"We're open Mon–Sat, 9am–6pm."</span> },
-      { <span class="token-key">q</span>: <span class="token-string">"Do you offer refunds?"</span>,         <span class="token-key">a</span>: <span class="token-string">"Yes, full refund within 30 days."</span> }
+    <span class="k">apiKey</span>:        <span class="s">"sk-ant-api03-YOUR-KEY-HERE"</span>,
+    <span class="k">botName</span>:       <span class="s">"Orion"</span>,
+    <span class="k">subtitle</span>:      <span class="s">"Ask me anything"</span>,
+    <span class="k">primaryColor</span>:  <span class="s">"#534AB7"</span>,
+    <span class="k">systemPrompt</span>:  <span class="s">"You are a helpful assistant for MyWebsite."</span>,
+    <span class="k">pages</span>: [
+      { <span class="k">title</span>: <span class="s">"Enroll Now"</span>,  <span class="k">url</span>: <span class="s">"/enroll"</span>,  <span class="k">keywords</span>: [<span class="s">"enroll"</span>, <span class="s">"register"</span>, <span class="s">"sign up"</span>] },
+      { <span class="k">title</span>: <span class="s">"View Courses"</span>, <span class="k">url</span>: <span class="s">"/courses"</span>, <span class="k">keywords</span>: [<span class="s">"courses"</span>, <span class="s">"programs"</span>] },
+      { <span class="k">title</span>: <span class="s">"Pricing"</span>,      <span class="k">url</span>: <span class="s">"/pricing"</span>, <span class="k">keywords</span>: [<span class="s">"price"</span>, <span class="s">"cost"</span>, <span class="s">"fee"</span>] },
+      { <span class="k">title</span>: <span class="s">"Contact Us"</span>,   <span class="k">url</span>: <span class="s">"/contact"</span>, <span class="k">keywords</span>: [<span class="s">"contact"</span>, <span class="s">"support"</span>] }
+    ],
+    <span class="k">knowledgeBase</span>: [
+      { <span class="k">q</span>: <span class="s">"What are your hours?"</span>, <span class="k">a</span>: <span class="s">"Mon–Sat, 9am–6pm."</span> }
     ]
   }
-<span class="token-tag">&lt;/script&gt;</span>
-<span class="token-tag">&lt;script <span class="token-attr">src</span>=<span class="token-string">"orion.js"</span>&gt;&lt;/script&gt;</span></pre>
+<span class="t">&lt;/script&gt;</span>
+<span class="t">&lt;script <span class="k">src</span>=<span class="s">"orion.js"</span>&gt;&lt;/script&gt;</span></pre>
+      <p style="margin-top:14px; font-size:13px; color:#888">✅ A chat bubble appears in the corner. That's it.</p>
+    </div>
+  </div>
 
-      <p style="margin-top:16px; font-size:13px; color:#888">That's it. A chat bubble appears in the corner. ✅</p>
+  <!-- PAGE ROUTING -->
+  <div id="page-routing" style="margin-top:40px">
+    <div class="section-label">Smart Page Routing <span class="new-badge">NEW</span></div>
+    <div class="card">
+      <h3>What it does</h3>
+      <p>When a user asks something that matches one of your pages, Orion automatically appends a clickable button to its reply that takes the user directly to that page — just like AtomBot.</p>
+
+      <h3 style="margin-top:16px">How it looks</h3>
+      <div class="preview-box">
+        <div class="preview-avatar">O</div>
+        <div class="preview-bubble">
+          You can register for the AI Bootcamp starting June 9th. Seats are limited so it's best to sign up early!
+          <br/>
+          <a class="preview-btn" href="#">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Enroll Now
+          </a>
+        </div>
+      </div>
+
+      <h3 style="margin-top:20px">How to configure</h3>
+      <p>Add a <code style="background:#f0f0f8;padding:2px 6px;border-radius:4px;font-size:12px">pages</code> array to your config. Each entry has a title, URL, and keywords:</p>
+      <pre><span class="k">pages</span>: [
+  {
+    <span class="k">title</span>:    <span class="s">"Enroll Now"</span>,         <span class="c">// Button label</span>
+    <span class="k">url</span>:      <span class="s">"/enroll"</span>,            <span class="c">// Where the button links</span>
+    <span class="k">keywords</span>: [<span class="s">"enroll"</span>, <span class="s">"register"</span>, <span class="s">"sign up"</span>, <span class="s">"join"</span>]
+  },
+  {
+    <span class="k">title</span>:    <span class="s">"Pricing"</span>,
+    <span class="k">url</span>:      <span class="s">"/pricing"</span>,
+    <span class="k">keywords</span>: [<span class="s">"price"</span>, <span class="s">"cost"</span>, <span class="s">"fee"</span>, <span class="s">"how much"</span>]
+  }
+]</pre>
+
+      <h3 style="margin-top:20px">How routing works (two layers)</h3>
+      <p><strong>Layer 1 — Claude decides:</strong> The AI reads your pages list and decides when a button is genuinely helpful. It picks the right page and appends it to its reply automatically.</p>
+      <p style="margin-top:8px"><strong>Layer 2 — Keyword fallback:</strong> If Claude doesn't route but the user's message contains a keyword match, the widget adds the button client-side. No extra API calls.</p>
     </div>
   </div>
 
   <!-- OPTIONS -->
   <div style="margin-top:40px">
-    <div class="section-label">Customization options</div>
+    <div class="section-label">All features</div>
     <div class="grid-2">
       <div class="option-card">
         <div class="badge badge-purple">Branding</div>
-        <h4>Bot name & color</h4>
-        <p>Set <code style="background:#f0f0f8;padding:1px 5px;border-radius:3px;font-size:12px">botName</code> and <code style="background:#f0f0f8;padding:1px 5px;border-radius:3px;font-size:12px">primaryColor</code> to match your brand. The widget auto-derives hover and accent shades.</p>
+        <h4>Name & color</h4>
+        <p>Set <code style="background:#f0f0f8;padding:1px 5px;border-radius:3px;font-size:12px">botName</code> and <code style="background:#f0f0f8;padding:1px 5px;border-radius:3px;font-size:12px">primaryColor</code> to match your brand.</p>
       </div>
       <div class="option-card">
         <div class="badge badge-green">AI Persona</div>
         <h4>System prompt</h4>
-        <p>Define the bot's personality, scope, and rules in plain English. The bot follows it on every message.</p>
+        <p>Define the bot's role, personality, and rules in plain English.</p>
+      </div>
+      <div class="option-card">
+        <div class="badge badge-blue">Routing ✦</div>
+        <h4>Smart page buttons</h4>
+        <p>Bot detects intent and sends a redirect button to the right page automatically.</p>
       </div>
       <div class="option-card">
         <div class="badge badge-purple">Knowledge</div>
         <h4>Knowledge base</h4>
-        <p>Add Q&A pairs to teach the bot about your business — hours, pricing, policies, FAQs — without any fine-tuning.</p>
+        <p>Q&A pairs injected as context — no fine-tuning needed.</p>
       </div>
       <div class="option-card">
         <div class="badge badge-gray">Layout</div>
         <h4>Position</h4>
-        <p>Set <code style="background:#f0f0f8;padding:1px 5px;border-radius:3px;font-size:12px">position: "left"</code> or <code style="background:#f0f0f8;padding:1px 5px;border-radius:3px;font-size:12px">"right"</code> to place the launcher where it fits your layout.</p>
+        <p>Set <code style="background:#f0f0f8;padding:1px 5px;border-radius:3px;font-size:12px">position: "left"</code> or <code style="background:#f0f0f8;padding:1px 5px;border-radius:3px;font-size:12px">"right"</code>.</p>
+      </div>
+      <div class="option-card">
+        <div class="badge badge-green">Memory</div>
+        <h4>Multi-turn chat</h4>
+        <p>Full conversation history sent on every message — the bot remembers context.</p>
       </div>
     </div>
   </div>
@@ -152,52 +198,52 @@
   <!-- CONFIG REF -->
   <div id="config-ref" style="margin-top:40px">
     <div class="section-label">Full config reference</div>
-    <div class="card" style="padding: 0; overflow: hidden;">
+    <div class="card" style="padding:0; overflow:hidden;">
       <table>
         <thead>
           <tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr>
         </thead>
         <tbody>
           <tr><td><code>apiKey</code></td><td>string</td><td>—</td><td><strong>Required.</strong> Your Anthropic API key.</td></tr>
-          <tr><td><code>botName</code></td><td>string</td><td>"Assistant"</td><td>Bot display name shown in header & avatar.</td></tr>
-          <tr><td><code>subtitle</code></td><td>string</td><td>"AI-powered chat"</td><td>Small text under the bot name in the header.</td></tr>
-          <tr><td><code>primaryColor</code></td><td>hex string</td><td>"#534AB7"</td><td>Main accent color for header, bubbles, send button.</td></tr>
-          <tr><td><code>position</code></td><td>"right" | "left"</td><td>"right"</td><td>Which corner the launcher sits in.</td></tr>
-          <tr><td><code>systemPrompt</code></td><td>string</td><td>Generic prompt</td><td>Instructions that define the bot's role and behavior.</td></tr>
-          <tr><td><code>knowledgeBase</code></td><td>array</td><td>[]</td><td>Array of <code>{q, a}</code> pairs injected as context.</td></tr>
-          <tr><td><code>welcomeMessage</code></td><td>string</td><td>"Hi! I'm {name} 👋"</td><td>First message the bot sends on open.</td></tr>
+          <tr><td><code>botName</code></td><td>string</td><td>"Orion"</td><td>Bot display name.</td></tr>
+          <tr><td><code>subtitle</code></td><td>string</td><td>"Orion Assistant"</td><td>Tagline under bot name in header.</td></tr>
+          <tr><td><code>primaryColor</code></td><td>hex</td><td>"#534AB7"</td><td>Main accent color throughout widget.</td></tr>
+          <tr><td><code>position</code></td><td>"right"/"left"</td><td>"right"</td><td>Corner where launcher sits.</td></tr>
+          <tr><td><code>systemPrompt</code></td><td>string</td><td>Generic prompt</td><td>Instructions defining bot role and behavior.</td></tr>
+          <tr><td><code>pages</code></td><td>array</td><td>[]</td><td>Page routing entries: <code>{title, url, keywords[]}</code>.</td></tr>
+          <tr><td><code>knowledgeBase</code></td><td>array</td><td>[]</td><td>FAQ pairs: <code>{q, a}</code> injected as context.</td></tr>
+          <tr><td><code>welcomeMessage</code></td><td>string</td><td>"Hi! I'm Orion 👋"</td><td>First message on open.</td></tr>
           <tr><td><code>placeholder</code></td><td>string</td><td>"Type a message..."</td><td>Input placeholder text.</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- SECURITY NOTE -->
+  <!-- SECURITY -->
   <div style="margin-top:40px">
     <div class="section-label">Security note</div>
     <div class="card">
-      <h3>⚠️ API key exposure</h3>
-      <p>
-        With this client-side setup, the API key is visible in the browser's source code. This is fine for personal projects, internal tools, or quick prototypes.
-        For production public websites, the recommended approach is to route calls through a lightweight backend proxy (Node.js / Python / Vercel function) that holds the key server-side.
-        See the <code style="background:#f0f0f8;padding:2px 6px;border-radius:4px;font-size:12px">proxy-server/</code> folder in this repo for a ready-to-deploy example.
-      </p>
+      <h3>⚠️ API key visibility</h3>
+      <p>With client-side setup the API key is visible in browser source. Fine for internal tools, prototypes, and low-traffic sites. For public production sites, use the proxy server in <code style="background:#f0f0f8;padding:2px 5px;border-radius:4px;font-size:12px">proxy-server/</code> — it holds your key server-side and the widget calls your proxy instead of Anthropic directly.</p>
     </div>
   </div>
 
 </main>
 
-<div class="footer">Orion Assistant Widget — open source, free to use</div>
+<div class="footer">Orion Assistant v1.1 — open source, free to use · Powered by Claude AI</div>
 
-<!-- ═══ Live demo of the actual widget ═══ -->
+<!-- Live demo widget -->
 <script>
   window.OrionConfig = {
-    apiKey: "",  // left blank in demo — see index.html for real usage
-    botName: "Orion Assistant",
-    subtitle: "Demo — add your API key",
+    apiKey: "",
+    botName: "Orion",
+    subtitle: "Live demo",
     primaryColor: "#534AB7",
-    systemPrompt: "You are Orion Assistant, a demo AI assistant. Since no API key is configured in this demo, explain to the user that they need to add their own Anthropic API key to window.OrionConfig.apiKey to activate the bot.",
-    welcomeMessage: "Hi! I'm Orion Assistant 👋 This is a live demo. Add your Anthropic API key to activate me!",
+    systemPrompt: "You are Orion, a demo assistant. Since no API key is set, tell the user to add their Anthropic API key to window.OrionConfig.apiKey to activate the bot.",
+    welcomeMessage: "Hi! I'm Orion 👋 Add your Anthropic API key to activate me. Check the docs above!",
+    pages: [
+      { title: "Get API Key", url: "https://console.anthropic.com", keywords: ["api key", "key", "activate", "how"] }
+    ]
   }
 </script>
 <script src="../orion.js"></script>

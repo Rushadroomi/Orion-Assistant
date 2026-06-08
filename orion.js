@@ -1,12 +1,12 @@
 /**
  * Orion Assistant — Embeddable AI Chat Widget
- * Version: 1.0.0
+ * Version: 1.1.0 — Smart Page Routing
  *
  * Usage:
  *   <script>
  *     window.OrionConfig = {
- *       apiKey: "sk-ant-...",          // required — developer's own Anthropic key
- *       botName: "MyBot",             // optional
+ *       apiKey: "sk-ant-...",          // required
+ *       botName: "Orion",             // optional
  *       subtitle: "AI Assistant",     // optional
  *       primaryColor: "#534AB7",      // optional
  *       position: "right",            // optional: "right" | "left"
@@ -14,8 +14,14 @@
  *       knowledgeBase: [              // optional
  *         { q: "What are hours?", a: "9am-6pm Mon-Sat" }
  *       ],
- *       welcomeMessage: "Hi! How can I help?", // optional
- *       placeholder: "Type a message...",       // optional
+ *       pages: [                      // optional — smart page routing
+ *         { title: "Enroll Now",  url: "/enroll",  keywords: ["enroll", "register", "sign up"] },
+ *         { title: "Courses",     url: "/courses", keywords: ["courses", "bootcamp", "programs"] },
+ *         { title: "Pricing",     url: "/pricing", keywords: ["price", "cost", "fee"] },
+ *         { title: "Contact Us",  url: "/contact", keywords: ["contact", "support", "help"] }
+ *       ],
+ *       welcomeMessage: "Hi! How can I help?",
+ *       placeholder: "Type a message...",
  *     }
  *   </script>
  *   <script src="orion.js"></script>
@@ -35,11 +41,12 @@
   const WELCOME_MSG    = cfg.welcomeMessage || `Hi! I'm ${BOT_NAME} 👋 How can I help you today?`;
   const PLACEHOLDER    = cfg.placeholder || "Type a message...";
   const KNOWLEDGE_BASE = cfg.knowledgeBase || [];
+  const PAGES          = cfg.pages || [];
   const SYSTEM_PROMPT  = cfg.systemPrompt ||
     `You are ${BOT_NAME}, a helpful and friendly AI assistant embedded on a website. Answer questions clearly and concisely. If you don't know something, say so honestly.`;
 
   // ── Derived ───────────────────────────────────────────────────────
-  const LETTER  = BOT_NAME.charAt(0).toUpperCase();
+  const LETTER        = BOT_NAME.charAt(0).toUpperCase();
   const PRIMARY_DARK  = shadeColor(PRIMARY, -30);
   const PRIMARY_LIGHT = shadeColor(PRIMARY, 80);
 
@@ -52,19 +59,59 @@
   }
 
   // ── Conversation state ────────────────────────────────────────────
-  let history = [];
+  let history   = [];
   let isLoading = false;
 
-  // ── Build system prompt with KB ───────────────────────────────────
+  // ── Build system prompt with KB + pages ──────────────────────────
   function buildSystemPrompt() {
     let prompt = SYSTEM_PROMPT;
+
     if (KNOWLEDGE_BASE.length > 0) {
       prompt += "\n\nKnowledge base — use these facts when relevant:\n";
       KNOWLEDGE_BASE.forEach(item => {
         prompt += `Q: ${item.q}\nA: ${item.a}\n\n`;
       });
     }
+
+    if (PAGES.length > 0) {
+      prompt += "\n\nWebsite pages available for routing:\n";
+      PAGES.forEach(p => {
+        prompt += `- "${p.title}" → ${p.url}  (keywords: ${p.keywords.join(", ")})\n`;
+      });
+      prompt += `
+At the END of your reply, if the user's question is clearly answered by one of the pages above, append EXACTLY this on a new line (nothing else after it):
+ROUTE:{"title":"Page Title","url":"/page-url"}
+
+Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per reply. Do not mention the ROUTE tag in your text — it will be converted to a button automatically.`;
+    }
+
     return prompt;
+  }
+
+  // ── Smart page routing: parse ROUTE tag from reply ────────────────
+  function parseRoute(text) {
+    const match = text.match(/ROUTE:(\{[^}]+\})/);
+    if (!match) return { text, route: null };
+    try {
+      const route = JSON.parse(match[1]);
+      const cleanText = text.replace(/\n?ROUTE:\{[^}]+\}/, "").trimEnd();
+      return { text: cleanText, route };
+    } catch {
+      return { text, route: null };
+    }
+  }
+
+  // ── Keyword fallback routing (client-side, no API needed) ─────────
+  function detectRouteFromKeywords(userText) {
+    if (!PAGES.length) return null;
+    const lower = userText.toLowerCase();
+    let best = null;
+    let bestScore = 0;
+    PAGES.forEach(page => {
+      const score = page.keywords.filter(k => lower.includes(k.toLowerCase())).length;
+      if (score > bestScore) { bestScore = score; best = page; }
+    });
+    return bestScore > 0 ? best : null;
   }
 
   // ── Inject CSS ────────────────────────────────────────────────────
@@ -92,7 +139,7 @@
 
       #orion-window {
         position: fixed; bottom: 92px; ${side} z-index: 999998;
-        width: 370px; height: 560px; max-height: calc(100vh - 110px);
+        width: 370px; height: 580px; max-height: calc(100vh - 110px);
         background: #ffffff; border-radius: 16px;
         box-shadow: 0 8px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
         display: flex; flex-direction: column; overflow: hidden;
@@ -143,7 +190,7 @@
       .or-msg-avatar.user { background: #e2e2e8; color: #555; }
 
       .or-bubble {
-        max-width: 78%; padding: 9px 13px; font-size: 14px; line-height: 1.55;
+        max-width: 82%; padding: 9px 13px; font-size: 14px; line-height: 1.55;
         word-break: break-word;
       }
       .or-bubble.bot {
@@ -158,6 +205,20 @@
       }
       .or-time { font-size: 10px; color: #aaa; margin-top: 3px; text-align: right; }
       .or-msg-row.bot .or-time { text-align: left; }
+
+      /* ── Page route button ── */
+      .or-route-btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        margin-top: 8px; padding: 8px 14px;
+        background: ${PRIMARY}; color: #fff;
+        border: none; border-radius: 8px; cursor: pointer;
+        font-size: 13px; font-weight: 500; font-family: inherit;
+        text-decoration: none; transition: background 0.15s, transform 0.1s;
+        box-shadow: 0 2px 8px rgba(83,74,183,0.25);
+      }
+      .or-route-btn:hover { background: ${PRIMARY_DARK}; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(83,74,183,0.3); }
+      .or-route-btn:active { transform: translateY(0); }
+      .or-route-btn svg { flex-shrink: 0; }
 
       .or-typing { display: flex; gap: 4px; padding: 4px 0; align-items: center; }
       .or-typing-dot { width: 6px; height: 6px; border-radius: 50%; background: #bbb; animation: or-typing 1.1s infinite; }
@@ -210,7 +271,6 @@
 
   // ── Build DOM ─────────────────────────────────────────────────────
   function buildWidget() {
-    // Launcher button
     const launcher = document.createElement("button");
     launcher.id = "orion-launcher";
     launcher.setAttribute("aria-label", `Open ${BOT_NAME} chat`);
@@ -223,7 +283,6 @@
       </svg>`;
     launcher.addEventListener("click", toggleWindow);
 
-    // Chat window
     const win = document.createElement("div");
     win.id = "orion-window";
     win.setAttribute("role", "dialog");
@@ -258,7 +317,6 @@
     document.body.appendChild(launcher);
     document.body.appendChild(win);
 
-    // Events
     win.querySelector(".or-close-btn").addEventListener("click", toggleWindow);
     document.getElementById("or-send").addEventListener("click", sendMessage);
     document.getElementById("or-input").addEventListener("keydown", e => {
@@ -266,35 +324,45 @@
     });
     document.getElementById("or-input").addEventListener("input", autoResize);
 
-    // Welcome message
-    appendMessage("bot", WELCOME_MSG);
+    appendMessage("bot", WELCOME_MSG, null);
   }
 
   // ── Toggle window ─────────────────────────────────────────────────
   function toggleWindow() {
-    const win = document.getElementById("orion-window");
+    const win      = document.getElementById("orion-window");
     const launcher = document.getElementById("orion-launcher");
-    const isOpen = win.classList.contains("open");
+    const isOpen   = win.classList.contains("open");
     win.classList.toggle("open", !isOpen);
     launcher.classList.toggle("open", !isOpen);
     launcher.setAttribute("aria-expanded", String(!isOpen));
-    if (!isOpen) {
-      setTimeout(() => document.getElementById("or-input").focus(), 220);
-    }
+    if (!isOpen) setTimeout(() => document.getElementById("or-input").focus(), 220);
   }
 
-  // ── Append message ────────────────────────────────────────────────
-  function appendMessage(role, text) {
-    const msgs = document.getElementById("or-messages");
+  // ── Append message (with optional route button) ───────────────────
+  function appendMessage(role, text, route) {
+    const msgs  = document.getElementById("or-messages");
     const isBot = role === "bot";
     const time  = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    // Build route button HTML if route provided
+    let routeHtml = "";
+    if (route && route.url && route.title) {
+      routeHtml = `
+        <a class="or-route-btn" href="${escapeHtml(route.url)}" target="_blank" rel="noopener" aria-label="Go to ${escapeHtml(route.title)}">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          ${escapeHtml(route.title)}
+        </a>`;
+    }
 
     const row = document.createElement("div");
     row.className = `or-msg-row ${isBot ? "bot" : "user"}`;
     row.innerHTML = `
       <div class="or-msg-avatar ${isBot ? "bot" : "user"}">${isBot ? LETTER : "U"}</div>
       <div>
-        <div class="or-bubble ${isBot ? "bot" : "user"}">${escapeHtml(text).replace(/\n/g,"<br>")}</div>
+        <div class="or-bubble ${isBot ? "bot" : "user"}">${escapeHtml(text).replace(/\n/g,"<br>")}${routeHtml}</div>
         <div class="or-time">${time}</div>
       </div>`;
     msgs.appendChild(row);
@@ -303,13 +371,13 @@
   }
 
   function escapeHtml(str) {
-    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
 
   // ── Typing indicator ──────────────────────────────────────────────
   function showTyping() {
     const msgs = document.getElementById("or-messages");
-    const row = document.createElement("div");
+    const row  = document.createElement("div");
     row.className = "or-msg-row bot";
     row.id = "or-typing";
     row.innerHTML = `
@@ -340,13 +408,13 @@
   // ── Send message ──────────────────────────────────────────────────
   async function sendMessage() {
     if (isLoading) return;
-    const input = document.getElementById("or-input");
+    const input   = document.getElementById("or-input");
     const sendBtn = document.getElementById("or-send");
-    const text = input.value.trim();
+    const text    = input.value.trim();
     if (!text) return;
 
     if (!API_KEY) {
-      appendMessage("bot", "⚠️ No API key configured. Please set apiKey in window.OrionConfig.");
+      appendMessage("bot", "⚠️ No API key configured. Please set apiKey in window.OrionConfig.", null);
       return;
     }
 
@@ -355,7 +423,7 @@
     isLoading = true;
     sendBtn.disabled = true;
 
-    appendMessage("user", text);
+    appendMessage("user", text, null);
     history.push({ role: "user", content: text });
     showTyping();
 
@@ -382,9 +450,14 @@
       if (data.error) {
         showError(data.error.message || "API error. Check your API key.");
       } else {
-        const reply = data.content[0].text;
-        history.push({ role: "assistant", content: reply });
-        appendMessage("bot", reply);
+        const raw            = data.content[0].text;
+        const { text: reply, route } = parseRoute(raw);
+
+        // Fallback: if Claude didn't route but keywords match, route anyway
+        const finalRoute = route || (PAGES.length ? detectRouteFromKeywords(text) : null);
+
+        history.push({ role: "assistant", content: raw });
+        appendMessage("bot", reply, finalRoute);
       }
     } catch (err) {
       removeTyping();
@@ -398,7 +471,7 @@
 
   function showError(msg) {
     const msgs = document.getElementById("or-messages");
-    const div = document.createElement("div");
+    const div  = document.createElement("div");
     div.className = "or-error";
     div.textContent = "⚠️ " + msg;
     msgs.appendChild(div);
