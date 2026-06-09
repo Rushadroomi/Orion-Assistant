@@ -237,16 +237,16 @@
 <!-- Live demo widget -->
 <script>
   window.OrionConfig = {
-    apiKey: "",
-    botName: "Orion",
-    subtitle: "Live demo",
-    primaryColor: "#534AB7",
-    systemPrompt: "You are Orion, a demo assistant. Since no API key is set, tell the user to add their API key to window.OrionConfig.apiKey to activate the bot.",
-    welcomeMessage: "Hi! I'm Orion 👋 Add your API key to window.OrionConfig.apiKey to activate me. Check the docs above!",
-    pages: [
-      { title: "Get API Key", url: "https://openrouter.ai/keys", keywords: ["api key", "key", "activate", "how"] }
-    ]
-  }
+  apiEndpoint: "https://orion-assistant-khaki.vercel.app/api/chat",
+  botName: "Orion",
+  subtitle: "Live demo",
+  primaryColor: "#534AB7",
+  systemPrompt: "You are Orion, a helpful AI assistant. Help visitors understand what Orion Assistant is and how to integrate it into their website.",
+  welcomeMessage: "Hi! I'm Orion 👋 Try me out — I'm powered by AI. Ask me anything!",
+  pages: [
+    { title: "Get API Key", url: "https://openrouter.ai/keys", keywords: ["api key", "key", "free", "how"] }
+  ]
+}
 </script>
 <script src="../orion.js"></script>
 
