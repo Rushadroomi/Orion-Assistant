@@ -89,14 +89,14 @@
   <div id="quickstart">
     <div class="section-label">Quickstart</div>
     <div class="card">
-      <h3>Step 1 — Get your Anthropic API key</h3>
-      <p>Create a free account at <strong>console.anthropic.com</strong> and grab your API key. New accounts receive free credits.</p>
+      <h3>Step 1 — Get your free OpenRouter API key</h3>
+      <p>Create a free account at <strong><a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a></strong>. No credit card needed — free models available instantly.</p>
 
       <h3 style="margin-top:20px">Step 2 — Paste this before &lt;/body&gt;</h3>
       <pre><span class="c">&lt;!-- Orion Assistant — add before &lt;/body&gt; --&gt;</span>
 <span class="t">&lt;script&gt;</span>
   window.OrionConfig = {
-    <span class="k">apiKey</span>:        <span class="s">"sk-ant-api03-YOUR-KEY-HERE"</span>,
+    <span class="k">apiKey</span>:        <span class="s">"sk-or-v1-YOUR-OPENROUTER-KEY-HERE"</span>,
     <span class="k">botName</span>:       <span class="s">"Orion"</span>,
     <span class="k">subtitle</span>:      <span class="s">"Ask me anything"</span>,
     <span class="k">primaryColor</span>:  <span class="s">"#534AB7"</span>,
@@ -204,7 +204,9 @@
           <tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>apiKey</code></td><td>string</td><td>—</td><td><strong>Required.</strong> Your Anthropic API key.</td></tr>
+          <tr><td><code>apiKey</code></td><td>string</td><td>—</td><td>Your OpenRouter key (client-side mode)</td></tr>
+          <tr><td><code>apiEndpoint</code></td><td>string</td><td>—</td><td>Your Vercel proxy URL (secure mode — key stays server-side)</td></tr>
+          <tr><td><code>model</code></td><td>string</td><td>"openrouter/free"</td><td>AI model slug from openrouter.ai/models</td></tr>
           <tr><td><code>botName</code></td><td>string</td><td>"Orion"</td><td>Bot display name.</td></tr>
           <tr><td><code>subtitle</code></td><td>string</td><td>"Orion Assistant"</td><td>Tagline under bot name in header.</td></tr>
           <tr><td><code>primaryColor</code></td><td>hex</td><td>"#534AB7"</td><td>Main accent color throughout widget.</td></tr>
@@ -230,21 +232,21 @@
 
 </main>
 
-<div class="footer">Orion Assistant v1.1 — open source, free to use · Powered by Claude AI</div>
+<div class="footer">Orion Assistant v1.1 — open source, free to use · Powered by OpenRouter</div>
 
 <!-- Live demo widget -->
 <script>
   window.OrionConfig = {
-  apiEndpoint: "https://orion-assistant-khaki.vercel.app/api/chat",  // proxy — key is safe
-  botName: "Orion",
-  primaryColor: "#534AB7",
-  systemPrompt: "You are Orion, a helpful assistant.",
-  pages: [
-    { title: "Enroll Now",  url: "/enroll",  keywords: ["enroll", "register", "sign up"] },
-    { title: "Pricing",     url: "/pricing", keywords: ["price", "cost", "fee"] },
-    { title: "Contact Us",  url: "/contact", keywords: ["contact", "support"] }
-  ]
-}
+    apiKey: "",
+    botName: "Orion",
+    subtitle: "Live demo",
+    primaryColor: "#534AB7",
+    systemPrompt: "You are Orion, a demo assistant. Since no API key is set, tell the user to add their OpenRouter API key (from openrouter.ai/keys) to window.OrionConfig.apiKey to activate the bot.",
+    welcomeMessage: "Hi! I'm Orion 👋 Add your OpenRouter API key to activate me. Check the docs above!",
+    pages: [
+      { title: "Get API Key", url: "https://openrouter.ai/keys", keywords: ["api key", "key", "activate", "how"] }
+    ]
+  }
 </script>
 <script src="../orion.js"></script>
 

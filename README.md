@@ -3,7 +3,7 @@
 > Add a fully configured AI assistant to **any website** with one script tag.
 
 📖 **[Full Integration Guide →](INTEGRATION.md)**  
-> Developers bring their own Anthropic API key. Zero backend required for basic usage.
+> Developers bring their own OpenRouter API key. Zero backend required for basic usage.
 
 ---
 
@@ -25,7 +25,7 @@
 ```html
 <script>
   window.OrionConfig = {
-    apiKey:       "sk-ant-api03-YOUR-KEY-HERE",
+    apiKey:       "sk-or-v1-YOUR-KEY-HERE",
     botName:      "Orion",
     primaryColor: "#534AB7",
     systemPrompt: "You are a helpful assistant for MyWebsite.",
@@ -39,7 +39,7 @@
     ]
   }
 </script>
-<script src="https://cdn.jsdelivr.net/gh/RushadRoomi/orion-assistant@main/orion.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Rushadroomi/Orion-Assistant@main/orion.js"></script>
 ```
 
 ---
@@ -76,7 +76,9 @@ Orion: "You can sign up for the next batch starting June 9th!"
 
 | Option           | Type              | Default              | Description                                          |
 |------------------|-------------------|----------------------|------------------------------------------------------|
-| `apiKey`         | string            | **required**         | Your Anthropic API key                               |
+| `apiKey`         | string            | —                    | Your OpenRouter key `sk-or-v1-...` (client-side)     |
+| `apiEndpoint`    | string            | —                    | Your Vercel proxy URL (secure/production mode)        |
+| `model`          | string            | `"openrouter/free"`  | Any model slug from openrouter.ai/models              |
 | `botName`        | string            | `"Orion"`            | Bot name shown in header and avatar                  |
 | `subtitle`       | string            | `"Orion Assistant"`  | Tagline under bot name                               |
 | `primaryColor`   | hex string        | `"#534AB7"`          | Accent color for header, bubbles, buttons            |
@@ -95,7 +97,7 @@ Orion: "You can sign up for the next batch starting June 9th!"
 
 ```js
 window.OrionConfig = {
-  apiKey:       "sk-ant-...",
+  apiKey: "sk-or-v1-YOUR-OPENROUTER-KEY",
   botName:      "LearnBot",
   primaryColor: "#6C63FF",
   systemPrompt: "You are LearnBot for AcademyX. Help visitors learn about courses, pricing, and enrollment. Be encouraging.",
@@ -112,7 +114,7 @@ window.OrionConfig = {
 
 ```js
 window.OrionConfig = {
-  apiKey:       "sk-ant-...",
+  apiKey: "sk-or-v1-YOUR-OPENROUTER-KEY",
   botName:      "ShopBot",
   primaryColor: "#e63946",
   systemPrompt: "You are ShopBot for TrendStore. Help customers find products and understand our policies.",
@@ -128,13 +130,14 @@ window.OrionConfig = {
 
 ## 🔒 Security
 
-**Client-side (simple):** API key visible in browser source. Fine for internal tools and prototypes.
+**Client-side (simple):** Get a free key at [openrouter.ai/keys](https://openrouter.ai/keys). API key visible in browser source — fine for prototypes and internal tools.
 
 **Server-side proxy (recommended for production):**
 ```bash
 cd proxy-server
-ANTHROPIC_API_KEY=sk-ant-... node server.js
+ANTHROPIC_API_KEY=sk-or-v1-... node server.js
 # Or deploy to Vercel free: vercel deploy
+# Set ANTHROPIC_API_KEY = your OpenRouter key in Vercel env vars
 ```
 
 ---
@@ -161,7 +164,7 @@ orion-assistant/
 
 ```bash
 # Push to GitHub, then use:
-https://cdn.jsdelivr.net/gh/YOUR_USERNAME/orion-assistant@main/orion.js
+https://cdn.jsdelivr.net/gh/Rushadroomi/Orion-Assistant@main/orion.js
 ```
 
 ---
@@ -172,4 +175,4 @@ MIT — free for personal and commercial use.
 
 ---
 
-Built with ❤️ using the [Anthropic Claude API](https://anthropic.com)
+Built with ❤️ using [OpenRouter](https://openrouter.ai) — access 100+ AI models with one API key.

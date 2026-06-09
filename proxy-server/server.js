@@ -1,7 +1,7 @@
 /**
  * Orion Assistant Proxy Server
  * ─────────────────────────────────────────────
- * Use this when you want to keep the Anthropic API key server-side
+ * Use this when you want to keep the OpenRouter API key server-side
  * (recommended for public-facing production websites).
  *
  * The developer sets their API key as an environment variable.
@@ -11,7 +11,7 @@
  *
  * Local run:
  *   npm install
- *   ANTHROPIC_API_KEY=sk-ant-... node server.js
+ *   ANTHROPIC_API_KEY=sk-or-v1-... node server.js
  */
 
 const http = require("http");
@@ -41,7 +41,7 @@ function proxyToAnthropic(body, res) {
 
   const postData = JSON.stringify(body);
   const options = {
-    hostname: "api.anthropic.com",
+    hostname: "openrouter.ai",
     path: "/v1/messages",
     method: "POST",
     headers: {
