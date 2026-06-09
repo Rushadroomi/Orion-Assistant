@@ -1,7 +1,9 @@
 /**
- * Orion Assistant — Vercel Proxy (OpenRouter)
+ * Orion Assistant — Vercel Proxy (OpenRouter) with Rate Limiting
  * Keeps your OpenRouter API key server-side.
  * Set OPENROUTER_API_KEY = your OpenRouter key in Vercel env vars.
+ *
+ * Rate limit: 10 messages per IP per day (resets at midnight UTC)
  *
  * Endpoint: POST /api/chat
  * Body: { model, messages, max_tokens }
@@ -9,6 +11,41 @@
 
 const https = require("https");
 
+// ── In-memory rate limit store ────────────────────────────────────────
+// Note: resets on each Vercel cold start, but good enough for demo protection
+const rateLimitStore = {};
+const MAX_REQUESTS   = 10;   // max messages per IP per day
+const WINDOW_MS      = 24 * 60 * 60 * 1000; // 24 hours
+
+function getClientIP(req) {
+  return (
+    req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
+    req.headers["x-real-ip"] ||
+    req.socket?.remoteAddress ||
+    "unknown"
+  );
+}
+
+function checkRateLimit(ip) {
+  const now  = Date.now();
+  const entry = rateLimitStore[ip];
+
+  if (!entry || now - entry.windowStart > WINDOW_MS) {
+    // New window
+    rateLimitStore[ip] = { count: 1, windowStart: now };
+    return { allowed: true, remaining: MAX_REQUESTS - 1 };
+  }
+
+  if (entry.count >= MAX_REQUESTS) {
+    const resetIn = Math.ceil((WINDOW_MS - (now - entry.windowStart)) / 1000 / 60);
+    return { allowed: false, remaining: 0, resetIn };
+  }
+
+  entry.count++;
+  return { allowed: true, remaining: MAX_REQUESTS - entry.count };
+}
+
+// ── OpenRouter request ────────────────────────────────────────────────
 function openRouterRequest(body, origin) {
   return new Promise((resolve, reject) => {
     const postData = JSON.stringify({
@@ -41,8 +78,8 @@ function openRouterRequest(body, origin) {
   });
 }
 
+// ── Handler ───────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
-
   res.setHeader("Access-Control-Allow-Origin",  "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -55,6 +92,23 @@ module.exports = async function handler(req, res) {
     return;
   }
 
+  // ── Rate limit check ───────────────────────────────────────────────
+  const ip    = getClientIP(req);
+  const limit = checkRateLimit(ip);
+
+  res.setHeader("X-RateLimit-Limit",     MAX_REQUESTS);
+  res.setHeader("X-RateLimit-Remaining", limit.remaining);
+
+  if (!limit.allowed) {
+    res.status(429).json({
+      error: {
+        message: `Demo limit reached. You've used ${MAX_REQUESTS} free messages today. Come back tomorrow or add your own API key from openrouter.ai/keys to get unlimited access.`
+      }
+    });
+    return;
+  }
+
+  // ── Proxy to OpenRouter ────────────────────────────────────────────
   try {
     const origin = req.headers["origin"] || req.headers["referer"] || "";
     const result = await openRouterRequest(req.body, origin);
