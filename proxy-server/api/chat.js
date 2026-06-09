@@ -9,7 +9,7 @@
 
 const https = require("https");
 
-function openRouterRequest(body) {
+function openRouterRequest(body, origin) {
   return new Promise((resolve, reject) => {
     const postData = JSON.stringify({
       model:      body.model || "openrouter/free",
@@ -25,7 +25,7 @@ function openRouterRequest(body) {
         "Content-Type":   "application/json",
         "Content-Length": Buffer.byteLength(postData),
         "Authorization":  `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "HTTP-Referer":   req.headers["origin"] || req.headers["referer"] || "https://orion-assistant.vercel.app",
+        "HTTP-Referer":   origin || "https://orion-assistant.vercel.app",
         "X-Title":        "Orion Assistant"
       }
     };
@@ -56,7 +56,8 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const result = await openRouterRequest(req.body);
+    const origin = req.headers["origin"] || req.headers["referer"] || "";
+    const result = await openRouterRequest(req.body, origin);
     res.status(result.status).json(JSON.parse(result.body));
   } catch (err) {
     res.status(502).json({ error: { message: err.message } });

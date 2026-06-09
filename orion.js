@@ -46,7 +46,7 @@
   const SYSTEM_PROMPT  = cfg.systemPrompt ||
     `You are ${BOT_NAME}, a helpful and friendly AI assistant embedded on a website. Answer questions clearly and concisely. If you don't know something, say so honestly.`;
 
-  // ── OpenRouter API config ─────────────────────────────────────────
+  // ── API endpoint ─────────────────────────────────────────────────
   const API_URL = cfg.apiEndpoint || "https://openrouter.ai/api/v1/chat/completions";
 
   // ── Derived ───────────────────────────────────────────────────────
@@ -210,7 +210,6 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
       .or-send:active { transform: scale(0.95); }
       .or-send:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
-      .or-model-tag { font-size: 10px; color: #ccc; text-align: center; padding: 4px; background: #fff; }
       .or-branding { text-align: center; padding: 4px 0 6px; font-size: 10px; color: #ccc; background: #fff; border-top: 1px solid #f2f2f2; }
       .or-branding a { color: #bbb; text-decoration: none; }
       .or-branding a:hover { color: #888; }
@@ -270,7 +269,7 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
           </button>
         </div>
       </div>
-      <div class="or-branding" style="border-top:1px solid #f2f2f2">Powered by <a href="https://github.com/Rushadroomi/Orion-Assistant" target="_blank" rel="noopener">Orion Assistant</a></div>`;
+      <div class="or-branding">Powered by <a href="https://github.com/Rushadroomi/Orion-Assistant" target="_blank" rel="noopener">Orion Assistant</a></div>`;
 
     document.body.appendChild(launcher);
     document.body.appendChild(win);
@@ -362,7 +361,7 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
     el.style.height = Math.min(el.scrollHeight, 110) + "px";
   }
 
-  // ── Send message via OpenRouter ───────────────────────────────────
+  // ── Send message ─────────────────────────────────────────────────
   async function sendMessage() {
     if (isLoading) return;
     const input   = document.getElementById("or-input");
@@ -410,7 +409,7 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
       removeTyping();
 
       if (data.error) {
-        showError(data.error.message || "API error. Check your OpenRouter key.");
+        showError(data.error.message || "API error. Check your API key or endpoint.");
       } else {
         const raw   = data.choices[0].message.content;
         const { text: reply, route } = parseRoute(raw);

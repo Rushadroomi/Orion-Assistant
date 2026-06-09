@@ -42,13 +42,14 @@ function proxyToAnthropic(body, res) {
   const postData = JSON.stringify(body);
   const options = {
     hostname: "openrouter.ai",
-    path: "/v1/messages",
+    path: "/api/v1/chat/completions",
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Content-Length": Buffer.byteLength(postData),
-      "x-api-key": API_KEY,
-      "anthropic-version": "2023-06-01",
+      "Authorization": `Bearer ${API_KEY}`,
+      "HTTP-Referer": "https://orion-assistant.vercel.app",
+      "X-Title": "Orion Assistant",
     },
   };
 
