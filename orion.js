@@ -1,11 +1,13 @@
 /**
  * Orion Assistant — Embeddable AI Chat Widget
- * Version: 1.2.0 — OpenRouter Support
+ * Version: 1.3.0 — Multi-provider support
+ *
+ * Supports: OpenRouter, any OpenAI-compatible API, or your own proxy
  *
  * Usage:
  *   <script>
  *     window.OrionConfig = {
- *       apiKey:      "sk-or-YOUR-OPENROUTER-KEY",  // required
+ *       apiKey:      "sk-or-v1-...",  // use apiKey (client-side) OR apiEndpoint (secure proxy)
  *       model:       "openrouter/free", // optional, this is default
  *       botName:     "Orion",
  *       subtitle:    "AI Assistant",
@@ -268,8 +270,7 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
           </button>
         </div>
       </div>
-      <div class="or-model-tag">${MODEL}</div>
-      <div class="or-branding">Powered by <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a></div>`;
+      <div class="or-branding" style="border-top:1px solid #f2f2f2">Powered by <a href="https://github.com/Rushadroomi/Orion-Assistant" target="_blank" rel="noopener">Orion Assistant</a></div>`;
 
     document.body.appendChild(launcher);
     document.body.appendChild(win);
