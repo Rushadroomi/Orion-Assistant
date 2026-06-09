@@ -76,7 +76,7 @@ Orion: "You can sign up for the next batch starting June 9th!"
 
 | Option           | Type              | Default              | Description                                          |
 |------------------|-------------------|----------------------|------------------------------------------------------|
-| `apiKey`         | string            | —                    | Your OpenRouter key `sk-or-v1-...` (client-side)     |
+| `apiKey`         | string            | —                    | Your OpenRouter key `sk-or-v1-...` — use this OR `apiEndpoint` |
 | `apiEndpoint`    | string            | —                    | Your Vercel proxy URL (secure/production mode)        |
 | `model`          | string            | `"openrouter/free"`  | Any model slug from openrouter.ai/models              |
 | `botName`        | string            | `"Orion"`            | Bot name shown in header and avatar                  |
@@ -135,9 +135,9 @@ window.OrionConfig = {
 **Server-side proxy (recommended for production):**
 ```bash
 cd proxy-server
-ANTHROPIC_API_KEY=sk-or-v1-... node server.js
+OPENROUTER_API_KEY=sk-or-v1-... node server.js
 # Or deploy to Vercel free: vercel deploy
-# Set ANTHROPIC_API_KEY = your OpenRouter key in Vercel env vars
+# Set OPENROUTER_API_KEY = your OpenRouter key in Vercel env vars
 ```
 
 ---

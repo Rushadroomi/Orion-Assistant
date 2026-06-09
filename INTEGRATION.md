@@ -53,7 +53,7 @@ Click **Fork** on [github.com/Rushadroomi/Orion-Assistant](https://github.com/Ru
 1. Go to [vercel.com](https://vercel.com) → New Project → Import your forked repo
 2. Click **Deploy**
 3. Go to **Settings → Environment Variables** and add:
-   - Key: `ANTHROPIC_API_KEY`
+   - Key: `OPENROUTER_API_KEY`
    - Value: your OpenRouter key `sk-or-v1-...`
    - Enable **Sensitive**
    - Click Save

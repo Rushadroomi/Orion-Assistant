@@ -1,7 +1,7 @@
 /**
  * Orion Assistant — Vercel Proxy (OpenRouter)
  * Keeps your OpenRouter API key server-side.
- * Set ANTHROPIC_API_KEY = your OpenRouter key in Vercel env vars.
+ * Set OPENROUTER_API_KEY = your OpenRouter key in Vercel env vars.
  *
  * Endpoint: POST /api/chat
  * Body: { model, messages, max_tokens }
@@ -24,8 +24,8 @@ function openRouterRequest(body) {
       headers: {
         "Content-Type":   "application/json",
         "Content-Length": Buffer.byteLength(postData),
-        "Authorization":  `Bearer ${process.env.ANTHROPIC_API_KEY}`,
-        "HTTP-Referer":   "https://orion-proxy-server.vercel.app",
+        "Authorization":  `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "HTTP-Referer":   req.headers["origin"] || req.headers["referer"] || "https://orion-assistant.vercel.app",
         "X-Title":        "Orion Assistant"
       }
     };
@@ -50,7 +50,7 @@ module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") { res.status(204).end(); return; }
   if (req.method !== "POST")    { res.status(405).json({ error: "Method not allowed" }); return; }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.OPENROUTER_API_KEY) {
     res.status(500).json({ error: { message: "API key not configured on server." } });
     return;
   }

@@ -11,7 +11,7 @@
  *
  * Local run:
  *   npm install
- *   ANTHROPIC_API_KEY=sk-or-v1-... node server.js
+ *   OPENROUTER_API_KEY=sk-or-v1-... node server.js
  */
 
 const http = require("http");
@@ -21,7 +21,7 @@ const fs = require("fs");
 const path = require("path");
 
 const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.ANTHROPIC_API_KEY || "";
+const API_KEY = process.env.OPENROUTER_API_KEY || "";
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*"; // e.g. "https://mywebsite.com"
 
 // ── CORS helper ───────────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ function setCors(res) {
 function proxyToAnthropic(body, res) {
   if (!API_KEY) {
     res.writeHead(500, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: { message: "ANTHROPIC_API_KEY not set on server." } }));
+    res.end(JSON.stringify({ error: { message: "OPENROUTER_API_KEY not set on server." } }));
     return;
   }
 
@@ -115,6 +115,6 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n Orion Assistant Proxy Server running on http://localhost:${PORT}`);
-  console.log(` API key: ${API_KEY ? "✓ set" : "✗ MISSING — set ANTHROPIC_API_KEY"}`);
+  console.log(` API key: ${API_KEY ? "✓ set" : "✗ MISSING — set OPENROUTER_API_KEY"}`);
   console.log(` Allowed origin: ${ALLOWED_ORIGIN}\n`);
 });
