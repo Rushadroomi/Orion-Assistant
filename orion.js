@@ -45,7 +45,7 @@
     `You are ${BOT_NAME}, a helpful and friendly AI assistant embedded on a website. Answer questions clearly and concisely. If you don't know something, say so honestly.`;
 
   // ── OpenRouter API config ─────────────────────────────────────────
-  const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+  const API_URL = cfg.apiEndpoint || "https://openrouter.ai/api/v1/chat/completions";
 
   // ── Derived ───────────────────────────────────────────────────────
   const LETTER        = BOT_NAME.charAt(0).toUpperCase();
