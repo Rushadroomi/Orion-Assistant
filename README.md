@@ -1,6 +1,8 @@
 # Orion Assistant — Embeddable AI Chat Widget
 
-> Add a fully configured AI assistant to **any website** with one script tag.  
+> Add a fully configured AI assistant to **any website** with one script tag.
+
+📖 **[Full Integration Guide →](INTEGRATION.md)**  
 > Developers bring their own Anthropic API key. Zero backend required for basic usage.
 
 ---

@@ -42,15 +42,7 @@ function openRouterRequest(body) {
 }
 
 module.exports = async function handler(req, res) {
-  // Debug: GET request to check env
-  if (req.method === "GET") {
-    res.status(200).json({ 
-      status: "ok",
-      hasKey: !!process.env.ANTHROPIC_API_KEY,
-      keyPrefix: process.env.ANTHROPIC_API_KEY ? process.env.ANTHROPIC_API_KEY.substring(0, 10) + "..." : "NOT SET"
-    });
-    return;
-  }
+
   res.setHeader("Access-Control-Allow-Origin",  "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
