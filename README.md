@@ -1,144 +1,152 @@
 # Orion Assistant — Embeddable AI Chat Widget
 
-> Add a fully configured AI assistant to **any website** with one script tag.
+> Add a fully working AI assistant to **any website** in 2 minutes.  
+> Developers bring their own free API key. No backend required.
 
-📖 **[Full Integration Guide →](INTEGRATION.md)**  
-> Developers bring their own OpenRouter API key. Zero backend required for basic usage.
-
----
-
-## ✨ Features
-
-- 🔌 **One-line embed** — one script tag, done
-- 🎨 **Fully brandable** — name, color, persona, position
-- 🧭 **Smart page routing** — bot detects intent and sends a redirect button to the right page
-- 🧠 **Knowledge base** — teach the bot your FAQ without fine-tuning
-- 💬 **Multi-turn memory** — remembers context within a conversation
-- 📱 **Responsive** — works on desktop and mobile
-- 🔒 **Developer's own API key** — you control your costs
-- 🆓 **100% free** — open source MIT
+## 🚀 Live Demo
+👉 [Try Orion Assistant](https://orion-assistant-khaki.vercel.app)
 
 ---
 
-## 🚀 Quickstart
+## ⚡ Quickstart — 2 steps
+
+### Step 1 — Get a free API key
+Go to **[openrouter.ai/keys](https://openrouter.ai/keys)** → sign up free → copy your key.  
+No credit card needed. Free models available instantly.
+
+### Step 2 — Paste this into your HTML before `</body>`
 
 ```html
 <script>
   window.OrionConfig = {
     apiKey:       "sk-or-v1-YOUR-KEY-HERE",
-    botName:      "Orion",
+    botName:      "MyBot",
     primaryColor: "#534AB7",
-    systemPrompt: "You are a helpful assistant for MyWebsite.",
+    systemPrompt: "You are a helpful assistant for MyWebsite. Answer questions clearly.",
     pages: [
-      { title: "Enroll Now",  url: "/enroll",  keywords: ["enroll", "register", "sign up"] },
-      { title: "Pricing",     url: "/pricing", keywords: ["price", "cost", "fee"] },
-      { title: "Contact Us",  url: "/contact", keywords: ["contact", "support"] }
+      { title: "Home",     url: "/",        keywords: ["home"] },
+      { title: "About",    url: "/about",   keywords: ["about", "who are you"] },
+      { title: "Pricing",  url: "/pricing", keywords: ["price", "cost", "fee", "how much"] },
+      { title: "Contact",  url: "/contact", keywords: ["contact", "support", "help"] }
     ],
     knowledgeBase: [
-      { q: "What are your hours?", a: "Mon–Sat, 9am–6pm." }
+      { q: "What do you offer?",      a: "We offer amazing products and services." },
+      { q: "How can I contact you?",  a: "Email us at hello@mywebsite.com" }
     ]
   }
 </script>
 <script src="https://cdn.jsdelivr.net/gh/Rushadroomi/Orion-Assistant@main/orion.js"></script>
 ```
 
+**That's it. ✅** A chat bubble appears in the bottom-right corner of your website.
+
 ---
 
-## 🧭 Smart Page Routing (v1.1)
+## 🧭 Smart Page Routing
 
-When a user's question matches a page, Orion appends a clickable button to its reply:
+When a user asks something relevant, Orion automatically shows a button that takes them to the right page — no extra code needed.
 
 ```
-User:  "How do I enroll?"
-Orion: "You can sign up for the next batch starting June 9th!"
-       [ Enroll Now ↗ ]        ← button auto-appended, links to /enroll
+User:  "How much does it cost?"
+Orion: "Our plans start at $49/month..."
+       [ Pricing ↗ ]   ← button appears automatically
 ```
 
-### How routing works — two layers
+Just add your pages to the `pages` array and Orion handles the rest.
 
-**Layer 1 — Claude decides:** The AI reads your `pages` list and decides when a redirect is genuinely helpful. It picks the right page automatically.
+---
 
-**Layer 2 — Keyword fallback:** If Claude doesn't route but the user's message contains a keyword match, the widget adds the button client-side. No extra API calls.
+## ⚙️ All Config Options
 
-### Page entry format
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `apiKey` | string | — | Your OpenRouter key (client-side mode) |
+| `apiEndpoint` | string | — | Your proxy URL (secure mode — see below) |
+| `model` | string | `"openrouter/free"` | Any model from openrouter.ai/models |
+| `botName` | string | `"Orion"` | Bot name shown in header |
+| `subtitle` | string | `"Orion Assistant"` | Tagline under bot name |
+| `primaryColor` | hex | `"#534AB7"` | Accent color for the widget |
+| `position` | `"right"/"left"` | `"right"` | Corner where the bubble appears |
+| `systemPrompt` | string | Generic prompt | Bot personality and rules |
+| `pages` | `{title, url, keywords[]}[]` | `[]` | Smart page routing entries |
+| `knowledgeBase` | `{q, a}[]` | `[]` | FAQ pairs injected as context |
+| `welcomeMessage` | string | `"Hi! I'm Orion 👋"` | First message on open |
+| `placeholder` | string | `"Type a message..."` | Input placeholder |
 
+---
+
+## 🎨 Customization Examples
+
+### Change color and position
 ```js
-{
-  title:    "Enroll Now",                           // Button label
-  url:      "/enroll",                              // Absolute or relative URL
-  keywords: ["enroll", "register", "sign up", "join"]  // Trigger words
-}
+primaryColor: "#e63946",  // any hex color
+position:     "left",     // bottom-left corner
 ```
 
----
-
-## ⚙️ Full Config Reference
-
-| Option           | Type              | Default              | Description                                          |
-|------------------|-------------------|----------------------|------------------------------------------------------|
-| `apiKey`         | string            | —                    | Your OpenRouter key `sk-or-v1-...` — use this OR `apiEndpoint` |
-| `apiEndpoint`    | string            | —                    | Your Vercel proxy URL (secure/production mode)        |
-| `model`          | string            | `"openrouter/free"`  | Any model slug from openrouter.ai/models              |
-| `botName`        | string            | `"Orion"`            | Bot name shown in header and avatar                  |
-| `subtitle`       | string            | `"Orion Assistant"`  | Tagline under bot name                               |
-| `primaryColor`   | hex string        | `"#534AB7"`          | Accent color for header, bubbles, buttons            |
-| `position`       | `"right"/"left"`  | `"right"`            | Corner where launcher appears                        |
-| `systemPrompt`   | string            | Generic prompt       | Defines bot role, tone, and rules                    |
-| `pages`          | `{title,url,keywords[]}[]` | `[]`    | Smart page routing entries                           |
-| `knowledgeBase`  | `{q,a}[]`         | `[]`                 | FAQ pairs injected as context                        |
-| `welcomeMessage` | string            | `"Hi! I'm Orion 👋"` | First message shown on open                          |
-| `placeholder`    | string            | `"Type a message..."` | Input placeholder                                   |
-
----
-
-## 🎨 Examples
-
-### Bootcamp / EdTech
-
+### E-commerce store
 ```js
 window.OrionConfig = {
-  apiKey: "sk-or-v1-YOUR-OPENROUTER-KEY",
-  botName:      "LearnBot",
-  primaryColor: "#6C63FF",
-  systemPrompt: "You are LearnBot for AcademyX. Help visitors learn about courses, pricing, and enrollment. Be encouraging.",
-  pages: [
-    { title: "Browse Courses", url: "/courses", keywords: ["courses", "programs", "what do you offer"] },
-    { title: "Enroll Now",     url: "/enroll",  keywords: ["enroll", "register", "join", "start"] },
-    { title: "Pricing",        url: "/pricing", keywords: ["price", "cost", "fee", "how much"] },
-    { title: "Schedule",       url: "/schedule",keywords: ["schedule", "dates", "when", "batch"] }
-  ]
-}
-```
-
-### E-commerce
-
-```js
-window.OrionConfig = {
-  apiKey: "sk-or-v1-YOUR-OPENROUTER-KEY",
+  apiKey:       "sk-or-v1-YOUR-KEY",
   botName:      "ShopBot",
   primaryColor: "#e63946",
-  systemPrompt: "You are ShopBot for TrendStore. Help customers find products and understand our policies.",
+  systemPrompt: "You are ShopBot. Help customers find products and understand our return policy.",
   pages: [
-    { title: "Shop Now",       url: "/shop",    keywords: ["buy", "shop", "products", "browse"] },
-    { title: "Track Order",    url: "/orders",  keywords: ["order", "track", "shipping", "delivery"] },
-    { title: "Returns",        url: "/returns", keywords: ["return", "refund", "exchange"] }
+    { title: "Shop Now",    url: "/shop",    keywords: ["buy", "shop", "browse"] },
+    { title: "Track Order", url: "/orders",  keywords: ["order", "track", "shipping"] },
+    { title: "Returns",     url: "/returns", keywords: ["return", "refund", "exchange"] }
+  ]
+}
+```
+
+### School or university
+```js
+window.OrionConfig = {
+  apiKey:       "sk-or-v1-YOUR-KEY",
+  botName:      "CampusBot",
+  primaryColor: "#1a3a5c",
+  systemPrompt: "You are CampusBot. Help students with admissions, courses, and campus info.",
+  pages: [
+    { title: "Apply Now",   url: "/apply",   keywords: ["apply", "admission", "enroll"] },
+    { title: "Courses",     url: "/courses", keywords: ["courses", "programs", "study"] },
+    { title: "Contact",     url: "/contact", keywords: ["contact", "help", "support"] }
   ]
 }
 ```
 
 ---
 
-## 🔒 Security
+## 🔒 Secure Mode (Production)
 
-**Client-side (simple):** Get a free key at [openrouter.ai/keys](https://openrouter.ai/keys). API key visible in browser source — fine for prototypes and internal tools.
+By default the API key is visible in browser source. Fine for prototypes and internal tools.
 
-**Server-side proxy (recommended for production):**
+For public websites, deploy the included proxy server — your key stays server-side.
+
+### Deploy proxy to Vercel (free)
+
 ```bash
-cd proxy-server
-OPENROUTER_API_KEY=sk-or-v1-... node server.js
-# Or deploy to Vercel free: vercel deploy
-# Set OPENROUTER_API_KEY = your OpenRouter key in Vercel env vars
+# 1. Fork this repo on GitHub
+# 2. Go to vercel.com → New Project → Import your fork
+# 3. Deploy
+# 4. Go to Settings → Environment Variables → add:
+#    OPENROUTER_API_KEY = sk-or-v1-your-key   (mark as Sensitive)
+# 5. Redeploy
 ```
+
+### Use your proxy in the widget
+
+```html
+<script>
+  window.OrionConfig = {
+    apiEndpoint:  "https://YOUR-PROJECT.vercel.app/api/chat",  // no apiKey needed
+    botName:      "MyBot",
+    systemPrompt: "You are a helpful assistant.",
+    pages: [...]
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/gh/Rushadroomi/Orion-Assistant@main/orion.js"></script>
+```
+
+Your API key is now 100% hidden. ✅
 
 ---
 
@@ -146,25 +154,16 @@ OPENROUTER_API_KEY=sk-or-v1-... node server.js
 
 ```
 orion-assistant/
-├── orion.js              ← The embeddable widget (ship this)
+├── orion.js              ← The widget (developers load this via CDN)
 ├── demo/
-│   └── index.html        ← Developer docs + live demo
+│   └── index.html        ← Live docs + demo page
 ├── proxy-server/
 │   ├── server.js         ← Node.js proxy (Railway / Render)
 │   ├── package.json
 │   └── api/
-│       └── chat.js       ← Vercel serverless function
+│       └── chat.js       ← Vercel serverless function (with rate limiting)
 ├── vercel.json
 └── README.md
-```
-
----
-
-## 🌐 Hosting orion.js (free CDN via jsDelivr)
-
-```bash
-# Push to GitHub, then use:
-https://cdn.jsdelivr.net/gh/Rushadroomi/Orion-Assistant@main/orion.js
 ```
 
 ---
@@ -175,4 +174,4 @@ MIT — free for personal and commercial use.
 
 ---
 
-Built with ❤️ using [OpenRouter](https://openrouter.ai) — access 100+ AI models with one API key.
+Built with ❤️ using [OpenRouter](https://openrouter.ai) — access 100+ AI models with one free API key.
