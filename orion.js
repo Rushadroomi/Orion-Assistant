@@ -355,11 +355,8 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
       // Numbered lists
       .replace(/^\d+\. (.+)/gm, "<li>$1</li>")
       // Line breaks
-      .replace(/
-
-/g, "<br/><br/>")
-      .replace(/
-/g, "<br/>");
+      .replace(/\r?\n\r?\n/g, "<br/><br/>")
+      .replace(/\r?\n/g, "<br/>");
   }
 
   // ── Typing indicator ──────────────────────────────────────────────
