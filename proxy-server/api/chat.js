@@ -1,21 +1,16 @@
 /**
- * Orion Assistant — Vercel Proxy (OpenRouter) with Rate Limiting
- * Keeps your OpenRouter API key server-side.
- * Set OPENROUTER_API_KEY = your OpenRouter key in Vercel env vars.
+ * Orion Assistant — Vercel Proxy
+ * All settings are in config.js — edit that file, not this one.
  *
- * Rate limit: 10 messages per IP per day (resets at midnight UTC)
- *
+ * Set OPENROUTER_API_KEY in Vercel environment variables.
  * Endpoint: POST /api/chat
- * Body: { model, messages, max_tokens }
  */
 
-const https = require("https");
+const https  = require("https");
+const config = require("./config");
 
-// ── In-memory rate limit store ────────────────────────────────────────
-// Note: resets on each Vercel cold start, but good enough for demo protection
+// ── Rate limit store (in-memory) ──────────────────────────────────────
 const rateLimitStore = {};
-const MAX_REQUESTS   = 10;   // max messages per IP per day
-const WINDOW_MS      = 24 * 60 * 60 * 1000; // 24 hours
 
 function getClientIP(req) {
   return (
@@ -27,31 +22,36 @@ function getClientIP(req) {
 }
 
 function checkRateLimit(ip) {
-  const now  = Date.now();
+  const now   = Date.now();
   const entry = rateLimitStore[ip];
+  const { maxRequests, windowMs } = config.rateLimit;
 
-  if (!entry || now - entry.windowStart > WINDOW_MS) {
-    // New window
+  if (!entry || now - entry.windowStart > windowMs) {
     rateLimitStore[ip] = { count: 1, windowStart: now };
-    return { allowed: true, remaining: MAX_REQUESTS - 1 };
+    return { allowed: true, remaining: maxRequests - 1 };
   }
-
-  if (entry.count >= MAX_REQUESTS) {
-    const resetIn = Math.ceil((WINDOW_MS - (now - entry.windowStart)) / 1000 / 60);
+  if (entry.count >= maxRequests) {
+    const resetIn = Math.ceil((windowMs - (now - entry.windowStart)) / 60000);
     return { allowed: false, remaining: 0, resetIn };
   }
-
   entry.count++;
-  return { allowed: true, remaining: MAX_REQUESTS - entry.count };
+  return { allowed: true, remaining: maxRequests - entry.count };
 }
 
 // ── OpenRouter request ────────────────────────────────────────────────
 function openRouterRequest(body, origin) {
   return new Promise((resolve, reject) => {
+
+    // Trim history to max length
+    const messages = body.messages || [];
+    const trimmed  = messages.length > config.maxHistoryLength
+      ? messages.slice(messages.length - config.maxHistoryLength)
+      : messages;
+
     const postData = JSON.stringify({
-      model:      body.model || "openrouter/free",
-      max_tokens: body.max_tokens || 1000,
-      messages:   body.messages
+      model:      body.model || config.defaultModel,
+      max_tokens: config.maxTokens,
+      messages:   trimmed
     });
 
     const options = {
@@ -62,8 +62,8 @@ function openRouterRequest(body, origin) {
         "Content-Type":   "application/json",
         "Content-Length": Buffer.byteLength(postData),
         "Authorization":  `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "HTTP-Referer":   origin || "https://orion-assistant.vercel.app",
-        "X-Title":        "Orion Assistant"
+        "HTTP-Referer":   origin || config.referer,
+        "X-Title":        config.appTitle
       }
     };
 
@@ -78,39 +78,45 @@ function openRouterRequest(body, origin) {
   });
 }
 
-// ── Handler ───────────────────────────────────────────────────────────
+// ── Main handler ──────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin",  "*");
+
+  // CORS
+  const origin = req.headers["origin"] || req.headers["referer"] || "";
+  res.setHeader("Access-Control-Allow-Origin",  config.allowedOrigins);
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") { res.status(204).end(); return; }
   if (req.method !== "POST")    { res.status(405).json({ error: "Method not allowed" }); return; }
 
+  // API key check
   if (!process.env.OPENROUTER_API_KEY) {
     res.status(500).json({ error: { message: "API key not configured on server." } });
     return;
   }
 
-  // ── Rate limit check ───────────────────────────────────────────────
-  const ip    = getClientIP(req);
-  const limit = checkRateLimit(ip);
-
-  res.setHeader("X-RateLimit-Limit",     MAX_REQUESTS);
-  res.setHeader("X-RateLimit-Remaining", limit.remaining);
-
-  if (!limit.allowed) {
-    res.status(429).json({
-      error: {
-        message: `Demo limit reached. You've used ${MAX_REQUESTS} free messages today. Come back tomorrow or add your own API key from openrouter.ai/keys to get unlimited access.`
-      }
-    });
+  // Input length check
+  const messages = req.body?.messages || [];
+  const lastMsg  = messages[messages.length - 1]?.content || "";
+  if (lastMsg.length > config.maxMessageLength) {
+    res.status(400).json({ error: { message: `Message too long. Max ${config.maxMessageLength} characters.` } });
     return;
   }
 
-  // ── Proxy to OpenRouter ────────────────────────────────────────────
+  // Rate limit
+  const ip    = getClientIP(req);
+  const limit = checkRateLimit(ip);
+  res.setHeader("X-RateLimit-Limit",     config.rateLimit.maxRequests);
+  res.setHeader("X-RateLimit-Remaining", limit.remaining);
+
+  if (!limit.allowed) {
+    res.status(429).json({ error: { message: config.rateLimit.errorMessage } });
+    return;
+  }
+
+  // Proxy to OpenRouter
   try {
-    const origin = req.headers["origin"] || req.headers["referer"] || "";
     const result = await openRouterRequest(req.body, origin);
     res.status(result.status).json(JSON.parse(result.body));
   } catch (err) {
