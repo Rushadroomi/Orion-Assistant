@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Enroll — TechLearn</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f8; color: #1a1a1a; }
+    nav { background: #1a1a2e; padding: 16px 40px; display: flex; align-items: center; gap: 32px; }
+    .nav-logo { color: #a9a0f0; font-size: 18px; font-weight: 700; text-decoration: none; }
+    .nav-links { display: flex; gap: 24px; margin-left: auto; }
+    .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+    .page-hero { background: #1a1a2e; padding: 48px 40px; }
+    .page-hero h1 { color: #fff; font-size: 32px; font-weight: 700; }
+    .page-hero p { color: rgba(255,255,255,0.6); margin-top: 8px; font-size: 15px; }
+    .section { padding: 48px 40px; max-width: 640px; margin: 0 auto; }
+    .form-card { background: #fff; border-radius: 16px; padding: 32px; border: 1px solid #e8e8ef; }
+    .form-card h2 { font-size: 20px; font-weight: 600; margin-bottom: 24px; }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px; }
+    input, select { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1.5px solid #e0e0e8; background: #f8f8fb; font-size: 14px; font-family: inherit; color: #1a1a1a; outline: none; transition: border-color 0.15s; }
+    input:focus, select:focus { border-color: #534AB7; background: #fff; }
+    .btn { width: 100%; padding: 13px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; background: #534AB7; color: #fff; margin-top: 8px; transition: background 0.15s; }
+    .btn:hover { background: #3C3489; }
+    .success { display: none; text-align: center; padding: 32px; }
+    .success h3 { font-size: 22px; color: #1D9E75; margin-bottom: 8px; }
+    .success p { color: #666; font-size: 14px; }
+    footer { background: #13131f; padding: 24px 40px; text-align: center; color: #666; font-size: 13px; }
+  </style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">⭐ TechLearn</a>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="courses.html">Courses</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="enroll.html" class="active">Enroll</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <h1>Enroll Now</h1>
+  <p>Start your AI journey today. Next batch fills up fast.</p>
+</div>
+
+<div class="section">
+  <div class="form-card">
+    <h2>Registration Form</h2>
+    <div id="form-content">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" placeholder="Your full name"/>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" placeholder="your@email.com"/>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" placeholder="+92 300 0000000"/>
+      </div>
+      <div class="form-group">
+        <label>Select Course</label>
+        <select>
+          <option>AI & Machine Learning Bootcamp — PKR 75,000</option>
+          <option>Data Analytics Bootcamp — PKR 50,000</option>
+          <option>Agentic AI Bootcamp — PKR 50,000</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Academic Background</label>
+        <select>
+          <option>Computer Science / IT</option>
+          <option>Engineering</option>
+          <option>Business / Commerce</option>
+          <option>Other STEM</option>
+          <option>Non-STEM</option>
+        </select>
+      </div>
+      <button class="btn" onclick="submitForm()">Submit Registration →</button>
+    </div>
+    <div class="success" id="success">
+      <div style="font-size:48px;margin-bottom:16px">🎉</div>
+      <h3>Registration Received!</h3>
+      <p>Thank you! Our team will contact you within 24 hours to confirm your enrollment and payment details.</p>
+    </div>
+  </div>
+</div>
+
+<footer>© 2025 TechLearn · Demo for <a href="https://github.com/Rushadroomi/Orion-Assistant" style="color:#a9a0f0">Orion Assistant</a></footer>
+
+<script>
+function submitForm() {
+  document.getElementById('form-content').style.display = 'none';
+  document.getElementById('success').style.display = 'block';
+}
+
+window.OrionConfig = {
+  apiEndpoint: "https://orion-assistant-khaki.vercel.app/api/chat",
+  botName: "TechLearn Bot", subtitle: "Ask me anything", primaryColor: "#534AB7",
+  systemPrompt: "You are TechLearn Bot. Help users complete their enrollment. Only answer questions about TechLearn.",
+  welcomeMessage: "Hi! Need help with enrollment? I'm here 👋",
+  knowledgeBase: [
+    { q: "What info do I need to enroll?", a: "Just your name, email, phone number, and course selection. Fill the form above!" },
+    { q: "How long does enrollment take?", a: "Submit the form and our team contacts you within 24 hours to confirm." },
+    { q: "Can I pay in installments?", a: "Yes! Mention it when our team contacts you after registration." }
+  ],
+  pages: [
+    { title: "See Pricing",  url: "pricing.html", keywords: ["price", "cost", "fee", "how much"] },
+    { title: "All Courses",  url: "courses.html", keywords: ["courses", "which course", "what courses"] },
+    { title: "Contact Us",   url: "contact.html", keywords: ["contact", "help", "support"] }
+  ]
+}
+</script>
+<script src="../../orion.js"></script>
+</body>
+</html>

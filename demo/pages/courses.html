@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Courses — TechLearn</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f8; color: #1a1a1a; }
+    nav { background: #1a1a2e; padding: 16px 40px; display: flex; align-items: center; gap: 32px; }
+    .nav-logo { color: #a9a0f0; font-size: 18px; font-weight: 700; text-decoration: none; }
+    .nav-links { display: flex; gap: 24px; margin-left: auto; }
+    .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+    .page-hero { background: #1a1a2e; padding: 48px 40px; }
+    .page-hero h1 { color: #fff; font-size: 32px; font-weight: 700; }
+    .page-hero p { color: rgba(255,255,255,0.6); margin-top: 8px; font-size: 15px; }
+    .section { padding: 48px 40px; max-width: 1000px; margin: 0 auto; }
+    .course-card { background: #fff; border-radius: 14px; padding: 28px; border: 1px solid #e8e8ef; margin-bottom: 20px; display: flex; gap: 24px; align-items: flex-start; }
+    .course-icon { width: 52px; height: 52px; border-radius: 12px; background: #EEEDFE; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .course-body { flex: 1; }
+    .course-tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-bottom: 8px; background: #EEEDFE; color: #3C3489; }
+    .course-body h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .course-body p { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 12px; }
+    .course-meta { display: flex; gap: 20px; font-size: 13px; color: #888; margin-bottom: 16px; }
+    .course-price { font-size: 22px; font-weight: 700; color: #534AB7; }
+    .btn { padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; display: inline-block; background: #534AB7; color: #fff; margin-top: 12px; }
+    .btn:hover { background: #3C3489; }
+    footer { background: #13131f; padding: 24px 40px; text-align: center; color: #666; font-size: 13px; }
+  </style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">⭐ TechLearn</a>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="courses.html" class="active">Courses</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="enroll.html">Enroll</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <h1>Our Courses</h1>
+  <p>Industry-focused bootcamps designed to get you job-ready.</p>
+</div>
+
+<div class="section">
+  <div class="course-card">
+    <div class="course-icon">🤖</div>
+    <div class="course-body">
+      <span class="course-tag">Most Popular</span>
+      <h3>AI & Machine Learning Bootcamp</h3>
+      <p>Master Machine Learning, Deep Learning, NLP, Computer Vision, and Generative AI. Build a full portfolio of real-world projects. Taught by industry experts with hands-on sessions every week.</p>
+      <div class="course-meta"><span>⏱ 3 months</span><span>📅 Starts June 9th</span><span>👥 Live online classes</span><span>🎓 Certificate included</span></div>
+      <div class="course-price">PKR 75,000</div>
+      <a class="btn" href="enroll.html">Enroll Now →</a>
+    </div>
+  </div>
+
+  <div class="course-card">
+    <div class="course-icon">📊</div>
+    <div class="course-body">
+      <span class="course-tag" style="background:#E1F5EE;color:#0F6E56">Beginner Friendly</span>
+      <h3>Data Analytics Bootcamp</h3>
+      <p>Learn Excel, SQL, Python, Power BI, and Tableau. Open to any academic background. Perfect for anyone looking to break into data-driven roles.</p>
+      <div class="course-meta"><span>⏱ 3 months</span><span>📅 Starts June 18th</span><span>👥 Live online classes</span><span>🎓 Certificate included</span></div>
+      <div class="course-price">PKR 50,000</div>
+      <a class="btn" href="enroll.html">Enroll Now →</a>
+    </div>
+  </div>
+
+  <div class="course-card">
+    <div class="course-icon">🦾</div>
+    <div class="course-body">
+      <span class="course-tag" style="background:#E8F0FE;color:#1a56cc">New</span>
+      <h3>Agentic AI Bootcamp</h3>
+      <p>Build autonomous AI agents, RAG pipelines, LangChain workflows, and multi-agent systems. The most cutting-edge course we offer.</p>
+      <div class="course-meta"><span>⏱ 2 months</span><span>📅 Starts July 11th</span><span>👥 Live online classes</span><span>🎓 Certificate included</span></div>
+      <div class="course-price">PKR 50,000</div>
+      <a class="btn" href="enroll.html">Enroll Now →</a>
+    </div>
+  </div>
+</div>
+
+<footer>© 2025 TechLearn · Demo for <a href="https://github.com/Rushadroomi/Orion-Assistant" style="color:#a9a0f0">Orion Assistant</a></footer>
+
+<script>
+  window.OrionConfig = {
+    apiEndpoint: "https://orion-assistant-khaki.vercel.app/api/chat",
+    botName: "TechLearn Bot", subtitle: "Ask me anything", primaryColor: "#534AB7",
+    systemPrompt: "You are TechLearn Bot. Only answer questions about TechLearn courses, pricing, enrollment, and schedules. If asked anything else say: 'I can only help with TechLearn questions.'",
+    welcomeMessage: "Hi! Ask me about any of our courses 👋",
+    knowledgeBase: [
+      { q: "What courses do you offer?", a: "AI & ML Bootcamp (PKR 75,000), Data Analytics Bootcamp (PKR 50,000), and Agentic AI Bootcamp (PKR 50,000)." },
+      { q: "When do courses start?", a: "AI Bootcamp: June 9th. Data Analytics: June 18th. Agentic AI: July 11th." },
+      { q: "How long are courses?", a: "AI & ML and Data Analytics are 3 months. Agentic AI is 2 months." }
+    ],
+    pages: [
+      { title: "See Pricing",  url: "pricing.html", keywords: ["price", "cost", "fee", "how much"] },
+      { title: "Enroll Now",   url: "enroll.html",  keywords: ["enroll", "register", "sign up", "join"] },
+      { title: "Contact Us",   url: "contact.html", keywords: ["contact", "help", "support"] }
+    ]
+  }
+</script>
+<script src="../../orion.js"></script>
+</body>
+</html>

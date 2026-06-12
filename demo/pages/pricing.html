@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pricing — TechLearn</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f8; color: #1a1a1a; }
+    nav { background: #1a1a2e; padding: 16px 40px; display: flex; align-items: center; gap: 32px; }
+    .nav-logo { color: #a9a0f0; font-size: 18px; font-weight: 700; text-decoration: none; }
+    .nav-links { display: flex; gap: 24px; margin-left: auto; }
+    .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+    .page-hero { background: #1a1a2e; padding: 48px 40px; }
+    .page-hero h1 { color: #fff; font-size: 32px; font-weight: 700; }
+    .page-hero p { color: rgba(255,255,255,0.6); margin-top: 8px; font-size: 15px; }
+    .section { padding: 48px 40px; max-width: 900px; margin: 0 auto; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .pricing-card { background: #fff; border-radius: 16px; padding: 28px; border: 1px solid #e8e8ef; text-align: center; }
+    .pricing-card.featured { border-color: #534AB7; box-shadow: 0 0 0 2px #534AB720; }
+    .pricing-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: #534AB7; color: #fff; display: inline-block; margin-bottom: 16px; }
+    .pricing-name { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .pricing-price { font-size: 32px; font-weight: 700; color: #534AB7; margin: 16px 0 4px; }
+    .pricing-period { font-size: 13px; color: #888; margin-bottom: 20px; }
+    .pricing-features { list-style: none; text-align: left; margin-bottom: 24px; }
+    .pricing-features li { font-size: 14px; color: #555; padding: 6px 0; border-bottom: 1px solid #f0f0f4; display: flex; align-items: center; gap: 8px; }
+    .pricing-features li::before { content: "✓"; color: #1D9E75; font-weight: 700; }
+    .btn { display: block; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; background: #534AB7; color: #fff; text-align: center; transition: background 0.15s; }
+    .btn:hover { background: #3C3489; }
+    .btn-outline { background: transparent; color: #534AB7; border: 1.5px solid #534AB7; }
+    .btn-outline:hover { background: #EEEDFE; }
+    .note { text-align: center; margin-top: 32px; font-size: 13px; color: #888; }
+    footer { background: #13131f; padding: 24px 40px; text-align: center; color: #666; font-size: 13px; }
+  </style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">⭐ TechLearn</a>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="courses.html">Courses</a>
+    <a href="pricing.html" class="active">Pricing</a>
+    <a href="enroll.html">Enroll</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <h1>Simple, Transparent Pricing</h1>
+  <p>No hidden fees. Pay once, learn for life.</p>
+</div>
+
+<div class="section">
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-name">Data Analytics</div>
+      <div class="pricing-price">PKR 50,000</div>
+      <div class="pricing-period">one-time payment · 3 months</div>
+      <ul class="pricing-features">
+        <li>Live online classes</li>
+        <li>Excel, SQL, Python</li>
+        <li>Power BI & Tableau</li>
+        <li>Certificate of completion</li>
+        <li>Career support</li>
+      </ul>
+      <a class="btn btn-outline" href="enroll.html">Enroll Now</a>
+    </div>
+
+    <div class="pricing-card featured">
+      <span class="pricing-tag">Most Popular</span>
+      <div class="pricing-name">AI & ML Bootcamp</div>
+      <div class="pricing-price">PKR 75,000</div>
+      <div class="pricing-period">one-time payment · 3 months</div>
+      <ul class="pricing-features">
+        <li>Live online classes</li>
+        <li>ML, Deep Learning, NLP</li>
+        <li>Generative AI & LLMs</li>
+        <li>Portfolio projects</li>
+        <li>Certificate of completion</li>
+        <li>Career support + placement</li>
+      </ul>
+      <a class="btn" href="enroll.html">Enroll Now</a>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-name">Agentic AI</div>
+      <div class="pricing-price">PKR 50,000</div>
+      <div class="pricing-period">one-time payment · 2 months</div>
+      <ul class="pricing-features">
+        <li>Live online classes</li>
+        <li>AI Agents & RAG</li>
+        <li>LangChain & tools</li>
+        <li>Multi-agent systems</li>
+        <li>Certificate of completion</li>
+      </ul>
+      <a class="btn btn-outline" href="enroll.html">Enroll Now</a>
+    </div>
+  </div>
+
+  <p class="note">💳 Flexible installment plans available · <a href="contact.html" style="color:#534AB7">Contact us</a> for details</p>
+</div>
+
+<footer>© 2025 TechLearn · Demo for <a href="https://github.com/Rushadroomi/Orion-Assistant" style="color:#a9a0f0">Orion Assistant</a></footer>
+
+<script>
+  window.OrionConfig = {
+    apiEndpoint: "https://orion-assistant-khaki.vercel.app/api/chat",
+    botName: "TechLearn Bot", subtitle: "Ask me anything", primaryColor: "#534AB7",
+    systemPrompt: "You are TechLearn Bot. Only answer questions about TechLearn courses, pricing, and enrollment. If asked anything else say: 'I can only help with TechLearn questions.'",
+    welcomeMessage: "Hi! I can help with pricing questions 👋",
+    knowledgeBase: [
+      { q: "How much does AI bootcamp cost?", a: "The AI & ML Bootcamp costs PKR 75,000 for 3 months." },
+      { q: "Do you offer installments?", a: "Yes! We offer flexible payment plans. Contact us at contact.html for details." },
+      { q: "Is there a free trial?", a: "We offer a free demo class. Contact us to schedule one." }
+    ],
+    pages: [
+      { title: "Enroll Now",  url: "enroll.html",  keywords: ["enroll", "register", "sign up", "join", "buy"] },
+      { title: "Contact Us",  url: "contact.html", keywords: ["contact", "installment", "payment plan", "help"] },
+      { title: "All Courses", url: "courses.html", keywords: ["courses", "what", "offer", "programs"] }
+    ]
+  }
+</script>
+<script src="../../orion.js"></script>
+</body>
+</html>
