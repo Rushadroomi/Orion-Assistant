@@ -328,7 +328,7 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
     row.innerHTML = `
       <div class="or-msg-avatar ${isBot ? "bot" : "user"}">${isBot ? LETTER : "U"}</div>
       <div>
-        <div class="or-bubble ${isBot ? "bot" : "user"}">${escapeHtml(text).replace(/\n/g,"<br>")}${routeHtml}</div>
+        <div class="or-bubble ${isBot ? "bot" : "user"}">${isBot ? renderMarkdown(text) : escapeHtml(text).replace(/\n/g,"<br>")}${routeHtml}</div>
         <div class="or-time">${time}</div>
       </div>`;
     msgs.appendChild(row);
@@ -338,6 +338,28 @@ Only add a ROUTE if it is genuinely helpful. Never add more than one ROUTE per r
 
   function escapeHtml(str) {
     return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  // ── Markdown renderer ─────────────────────────────────────────────
+  function renderMarkdown(text) {
+    return text
+      // Escape HTML first
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      // Bold
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      // Italic
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      // Unordered lists — convert * item or - item lines into <ul><li>
+      .replace(/^[\*\-] (.+)/gm, "<li>$1</li>")
+      .replace(/(<li>.*<\/li>)/gs, "<ul style='margin:8px 0 8px 16px;display:flex;flex-direction:column;gap:4px'>$1</ul>")
+      // Numbered lists
+      .replace(/^\d+\. (.+)/gm, "<li>$1</li>")
+      // Line breaks
+      .replace(/
+
+/g, "<br/><br/>")
+      .replace(/
+/g, "<br/>");
   }
 
   // ── Typing indicator ──────────────────────────────────────────────
